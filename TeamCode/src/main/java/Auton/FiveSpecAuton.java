@@ -226,16 +226,18 @@ public class FiveSpecAuton extends LinearOpMode {
         private void setOuttakeState(OuttakeState state) {
             switch (state) {
                 case BASE:
-                    robot.scoring.clawPrimaryPivot.setPosition(0.00);
-                    robot.scoring.outtakeArmRotation.setPosition(0.00);
+                    robot.scoring.outtakeArmRotation.setPosition(0.0);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.0);
                     break;
+
                 case COLLECTION:
-                    robot.scoring.clawPrimaryPivot.setPosition(0.45);
-                    robot.scoring.outtakeArmRotation.setPosition(0.15);
+                    robot.scoring.outtakeArmRotation.setPosition(0.38);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.05);
                     break;
-                case SCORING:
-                    robot.scoring.clawPrimaryPivot.setPosition(0.90);
-                    robot.scoring.outtakeArmRotation.setPosition(1.00);
+
+                case SCORING: // Default
+                    robot.scoring.outtakeArmRotation.setPosition(0.80);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.75);
                     break;
             }
         }

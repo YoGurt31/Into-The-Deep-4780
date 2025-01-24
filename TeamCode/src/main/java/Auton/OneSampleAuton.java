@@ -37,6 +37,12 @@ public class OneSampleAuton extends LinearOpMode {
         CLOSE
     }
 
+    IntakeState intakeState = IntakeState.INACTIVE;
+    enum IntakeState {
+        ACTIVE,
+        INACTIVE
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addLine("Initializing...");
@@ -197,6 +203,21 @@ public class OneSampleAuton extends LinearOpMode {
 
             case CLOSE:
                 robot.scoring.clawStatus.setPosition(1.00);
+                break;
+        }
+    }
+
+    private void setIntakeState(IntakeState state) {
+        //Create sequence to run intake rollers until color sensor 1 detects black
+        intakeState = state;
+
+        switch (state) {
+            case INACTIVE:
+                robot.scoring.rollerInOut.setPower(0.0);
+                break;
+
+            case ACTIVE:
+                robot.scoring.rollerInOut.setPower(1.00);
                 break;
         }
     }

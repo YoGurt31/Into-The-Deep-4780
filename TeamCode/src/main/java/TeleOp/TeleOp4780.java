@@ -309,14 +309,14 @@ public class TeleOp4780 extends LinearOpMode {
                     break;
 
                 case COLLECTION:
-                    robot.scoring.outtakeArmRotation.setPosition(0.15);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.45);
+                    robot.scoring.outtakeArmRotation.setPosition(0.38);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.05);
 
                     break;
 
                 case SCORING: // Default
-                    robot.scoring.outtakeArmRotation.setPosition(1.00);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.90);
+                    robot.scoring.outtakeArmRotation.setPosition(0.80);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.75);
 
                     break;
             }
