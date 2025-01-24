@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.R;
+
 import Robot.Robot;
 
 @Autonomous(name = "19PtBucketAuton", group = "Auton")
@@ -70,39 +72,92 @@ public class OneSampleAuton extends LinearOpMode {
                 // Buffer
                 sleep(250);
 
+                // Rotate Robot 45º CW
+
                 // Stop Driving, Raise Slides
                 verticalSlidesToPosition(RAISED);
+
+                // Reset To Collection Position
+                setOuttakeState(OuttakeState.COLLECTION);
 
                 // Open Claw
                 setClawState(ClawState.OPEN);
 
-                // Reset To Collection Position
-                setOuttakeState(OuttakeState.COLLECTION);
+                // Reset To Scoring Position
+                setOuttakeState(OuttakeState.SCORING);
                 verticalSlidesToPosition(BASE);
 
-                // Drive To Collection Zone (South-East)
-                encoderDrive(-8, 0.5);
-                encoderStrafe(48, 0.5);
-                encoderDrive(-16, 0.5);
+                // Rotate Robot To 0º CW
 
-                // Human Player Buffer
-                sleep(500);
+                // Extendo Intake Sequence
+                horizontalSlidesToPosition(EXTENDED);
+                runIntakeSequeunce();
 
-                // Drive To Specimen, Close Claw
-                encoderDrive(-2, 0.5);
+                // Extendo Transfer Sequence
+                horizontalSlidesToPosition(RETRACTED);
+                setOuttakeState(OuttakeState.BASE);
                 setClawState(ClawState.CLOSE);
 
-                // Secondary Buffer
-                sleep(500);
+                // Buffer
+                sleep(250);
+
+                // Rotate Robot 45º CW
+
+                // Stop Driving, Raise Slides
+                verticalSlidesToPosition(RAISED);
+
+                // Reset To Collection Position
+                setOuttakeState(OuttakeState.COLLECTION);
+
+                // Open Claw
+                setClawState(ClawState.OPEN);
 
                 // Reset To Scoring Position
-                encoderDrive(2, 0.5);
                 setOuttakeState(OuttakeState.SCORING);
+                verticalSlidesToPosition(BASE);
+
+                // Rotate Robot To 0º CW
+
+                // Extendo Intake Sequence
+                horizontalSlidesToPosition(EXTENDED);
+                runIntakeSequeunce();
+
+                // Extendo Transfer Sequence
+                horizontalSlidesToPosition(RETRACTED);
+                setOuttakeState(OuttakeState.BASE);
+                setClawState(ClawState.CLOSE);
+
+                // Buffer
+                sleep(250);
+
+                // Rotate Robot 45º CW
+
+                // Stop Driving, Raise Slides
+                verticalSlidesToPosition(RAISED);
+
+                // Reset To Collection Position
+                setOuttakeState(OuttakeState.COLLECTION);
+
+                // Open Claw
+                setClawState(ClawState.OPEN);
+
+                // Reset To Scoring Position
+                setOuttakeState(OuttakeState.SCORING);
+                verticalSlidesToPosition(BASE);
+
+                // Rotate Robot To 0º CW
+
+                // Extendo Intake Sequence
+                horizontalSlidesToPosition(EXTENDED);
+                runIntakeSequeunce();
+
+                // Extendo Transfer Sequence
+                horizontalSlidesToPosition(RETRACTED);
+                setOuttakeState(OuttakeState.BASE);
+                setClawState(ClawState.CLOSE);
 
                 // Drive To Park
-                encoderDrive(-24, 0.5);
-                encoderStrafe(64, 0.5);
-                encoderDrive(-6, 0.5);
+
                 robot.driveTrain.brake();
 
                 telemetry.addLine("Autonomous Complete!");

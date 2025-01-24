@@ -127,9 +127,6 @@
 //                sleep(30000);
 //            }
 //        }
-//
-//        telemetry.addLine("Autonomous complete.");
-//        telemetry.update();
 //    }
 //
 //    private void setOuttakeState(OuttakeState state) {

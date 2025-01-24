@@ -1,6 +1,6 @@
 //// Coded By Gurtej Singh
 //
-//package Auton;
+//package Auton.Testers;
 //
 //import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 //import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -48,8 +48,5 @@
 //
 //            }
 //        }
-//
-//        telemetry.addLine("Autonomous complete.");
-//        telemetry.update();
 //    }
 //}

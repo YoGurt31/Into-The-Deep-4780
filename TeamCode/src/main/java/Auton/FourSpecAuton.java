@@ -51,99 +51,17 @@ public class FourSpecAuton extends LinearOpMode {
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(90));
-        MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition);
+        MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 65%
+        MecanumDrive.PARAMS.maxWheelVel = 20;
+        MecanumDrive.PARAMS.maxProfileAccel = 20;
 
         waitForStart();
 
         Actions.runBlocking(Drive.actionBuilder(initialPosition)
-//                // Robot Setup
+                // Robot Setup
 //                .stopAndAdd(new ClawAction(ClawState.CLOSE))
 //                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
 //                .stopAndAdd(new VerticalSlideAction(RISE))
-//
-//                // Drive To Bar And Score Specimen #1
-//                .strafeToConstantHeading(new Vector2d(-5, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Drive To Collect Samples
-//                .strafeToConstantHeading(new Vector2d(36, -48))
-//
-//                .splineToConstantHeading(new Vector2d(44, -12), 0) // In Front of Sample 1
-//                .waitSeconds(0.025)
-//                .lineToY(-50) // Sample 1 Retrieved
-//
-//                .splineToConstantHeading(new Vector2d(56, -12), 0) // In Front of Sample 2
-//                .waitSeconds(0.025)
-//                .lineToY(-50) // Sample 2 Retrieved
-//
-//                .splineToConstantHeading(new Vector2d(62, -12), 0) // In Front of Sample 3
-//                .waitSeconds(0.025)
-//                .lineToY(-50) // Sample 3 Retrieved
-//
-//                // Collect Specimen #2
-//                .lineToY(-62)
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//
-//                // Score Specimen #2
-//                .strafeToConstantHeading(new Vector2d(-2.5, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Collect Specimen #3
-//                .strafeToConstantHeading(new Vector2d(40, -58))
-//                .waitSeconds(0.025)
-//                .lineToY(-62)
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//
-//                // Score Specimen #3
-//                .strafeToConstantHeading(new Vector2d(0, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Collect Specimen #4
-//                .strafeToConstantHeading(new Vector2d(40, -58))
-//                .waitSeconds(0.025)
-//                .lineToY(-62)
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//
-//                // Score Specimen #4
-//                .strafeToConstantHeading(new Vector2d(2.5, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Collect Specimen #5
-//                .strafeToConstantHeading(new Vector2d(40, -58))
-//                .waitSeconds(0.025)
-//                .lineToY(-62)
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//
-//                // Score Specimen #5
-//                .strafeToConstantHeading(new Vector2d(5, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Park
-//                .strafeToConstantHeading(new Vector2d(62, -60))
-
 
                 // Drive To Bar And Score Specimen #1
                 .strafeTo(new Vector2d(-6, -30))
