@@ -11,12 +11,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import Robot.Robot;
 
-@TeleOp(name = "TeleOp", group = "TeleOp")
-public class TeleOp4780 extends LinearOpMode {
+@TeleOp(name = "Blue", group = "TeleOp")
+public class TeleOp4780Blue extends LinearOpMode {
 
     private final Robot robot = new Robot();
 
-    OuttakeState outtakeState = OuttakeState.SCORING;
+    OuttakeState outtakeState = OuttakeState.COLLECTION;
 
     private final double intakeLiftedPosition = 0.00;
     private final double intakeLoweredPosition = 0.40;
@@ -34,24 +34,18 @@ public class TeleOp4780 extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        telemetry.addLine("Initialized! Activate Controller(s)...");
-
         robot.init(hardwareMap);
         robot.driveTrain.brake();
 
         robot.driveTrain.resetDriveTrainEncoders();
         robot.scoring.resetScoringEncoders();
 
+        telemetry.addLine("Initialized! Activate Controller(s)...");
+        telemetry.update();
+
         waitForStart();
 
-        ElapsedTime Timer = new ElapsedTime();
-        Timer.reset();
-
-        if (Timer.seconds() > 120) {
-            requestOpModeStop();
-        }
-
-        while (opModeIsActive() && Timer.seconds() < 120) {
+        while (opModeIsActive()) {
 
             robot.driveTrain.runWithoutDriveTrainEncoders();
             robot.scoring.runScoringEncoders();
@@ -169,25 +163,27 @@ public class TeleOp4780 extends LinearOpMode {
 
 
             // Intaked Colored Specimen Indicator
+            int Red1 = robot.scoring.colorSensor1.red();
+            int Green1 = robot.scoring.colorSensor1.green();
+            int Blue1 = robot.scoring.colorSensor1.blue();
+
             int Red2 = robot.scoring.colorSensor2.red();
             int Green2 = robot.scoring.colorSensor2.green();
             int Blue2 = robot.scoring.colorSensor2.blue();
 
-            boolean isYellow   = Red2 > 200 && Green2 > 300 && Blue2 < 200;
-            boolean isRed      = Red2 > 250 && Green2 < 225 && Blue2 < 125;
-            boolean isBlue     = Red2 < 125 && Green2 < 225 && Blue2 > 250;
+            boolean isIntakingYellow   = Red2 > 200 && Green2 > 300 && Blue2 < 200;
+            boolean isIntakingRed      = Red2 > 250 && Green2 < 225 && Blue2 < 125;
+            boolean isIntakingBlue     = Red2 < 125 && Green2 < 225 && Blue2 > 250;
 
             RevBlinkinLedDriver.BlinkinPattern currentPattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_WHITE;
             RevBlinkinLedDriver.BlinkinPattern targetPattern;
 
             ElapsedTime ColorTimer = new ElapsedTime();
 
-            if (isYellow) {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
-            } else if (isRed) {
+            if (isIntakingYellow || isIntakingBlue) {
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+            } else if (isIntakingRed) {
                 targetPattern = RevBlinkinLedDriver.BlinkinPattern.RED;
-            } else if (isBlue) {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
             } else {
                 targetPattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
             }
@@ -198,14 +194,18 @@ public class TeleOp4780 extends LinearOpMode {
                 ColorTimer.reset();
             }
 
-            telemetry.addLine("----- Color Sensor Info -----");
-            telemetry.addData("Red: ", Red2);
-            telemetry.addData("Green: ", Green2);
-            telemetry.addData("Blue: ", Blue2);
+            telemetry.addLine("----- Color Sensor(s) Info -----");
+            telemetry.addData("Red 1: ", Red1);
+            telemetry.addData("Green 1: ", Green1);
+            telemetry.addData("Blue 1: ", Blue1);
             telemetry.addLine();
-            telemetry.addData("Is Yellow: ", isYellow);
-            telemetry.addData("Is Blue: ", isBlue);
-            telemetry.addData("Is Red: ", isRed);
+            telemetry.addData("Red 2: ", Red2);
+            telemetry.addData("Green 2: ", Green2);
+            telemetry.addData("Blue 2: ", Blue2);
+            telemetry.addLine();
+            telemetry.addData("Is Yellow: ", isIntakingYellow);
+            telemetry.addData("Is Blue: ", isIntakingBlue);
+            telemetry.addData("Is Red: ", isIntakingRed);
 
             telemetry.addLine("\n");
 
@@ -327,7 +327,7 @@ public class TeleOp4780 extends LinearOpMode {
             telemetry.addData("Primary Pivot Position", "%.2f", robot.scoring.clawPrimaryPivot.getPosition());
 
             double clawPosition = robot.scoring.clawStatus.getPosition();
-            String clawStatus = clawPosition == 0.25 ? "Open" : clawPosition == 0.75 ? "Closed" : "Partially Open";
+            String clawStatus = clawPosition == 0.25 ? "Open" : "Closed";
             telemetry.addData("Claw Status", clawStatus);
             telemetry.addData("Claw Position", "%.2f", clawPosition);
 

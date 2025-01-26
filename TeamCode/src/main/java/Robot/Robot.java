@@ -117,19 +117,12 @@ public class Robot {
             rollerInOut.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             intakePivot = hwMap.servo.get("intakePivot");                // Config 0 (Control)
-            intakePivot.setPosition(0.00); // Servo
 
             outtakeArmRotation = hwMap.servo.get("outtakeArmRotation");  // Config 0 (Expansion)
-            outtakeArmRotation.setPosition(1.00); // Servo
-            // 0 – Low     1 – High
 
             clawPrimaryPivot = hwMap.servo.get("clawPrimaryPivot");      // Config 2 (Expansion)
-            clawPrimaryPivot.setPosition(0.90); // Servo
-            // 0 – Low     1 – High
 
             clawStatus = hwMap.servo.get("clawStatus");                  // Config 3 (Expansion)
-            clawPrimaryPivot.setPosition(0.25); // Servo
-            // 0.25 – Open     0.75 – Close
 
             blinkinLedDriver = hwMap.get(RevBlinkinLedDriver.class, "LED");  // Config 0 (Control)
             blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_COLOR_WAVES);
@@ -140,8 +133,8 @@ public class Robot {
             colorSensor2 = hwMap.get(ColorSensor.class, "colorSensor2");       // Config I2C Bus 2 (Control)  (Checks Which Sample Is Being Intaked)
             colorSensor2.enableLed(true);
 
-//            colorSensor3 = hwMap.get(ColorSensor.class, "colorSensor3");       // Config I2C Bus 3 (Control)
-//            colorSensor3.enableLed(true);
+            colorSensor3 = hwMap.get(ColorSensor.class, "colorSensor3");       // Config I2C Bus 3 (Control)
+            colorSensor3.enableLed(true);
         }
 
         public void runScoringEncoders() {

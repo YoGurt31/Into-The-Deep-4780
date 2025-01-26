@@ -51,160 +51,96 @@ public class FiveSpecAuton extends LinearOpMode {
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(90));
-        MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition);
+        MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 80%
+        MecanumDrive.PARAMS.maxWheelVel = 80;
+        MecanumDrive.PARAMS.maxProfileAccel = 80;
 
         waitForStart();
 
         Actions.runBlocking(Drive.actionBuilder(initialPosition)
-//                // Robot Setup
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//
-//                // Drive To Bar And Score Specimen #1
-//                .strafeToConstantHeading(new Vector2d(-5, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Drive To Collect Samples
-//                .strafeToConstantHeading(new Vector2d(36, -48))
-//
-//                .splineToConstantHeading(new Vector2d(44, -12), 0) // In Front of Sample 1
-//                .waitSeconds(0.025)
-//                .lineToY(-50) // Sample 1 Retrieved
-//
-//                .splineToConstantHeading(new Vector2d(56, -12), 0) // In Front of Sample 2
-//                .waitSeconds(0.025)
-//                .lineToY(-50) // Sample 2 Retrieved
-//
-//                .splineToConstantHeading(new Vector2d(62, -12), 0) // In Front of Sample 3
-//                .waitSeconds(0.025)
-//                .lineToY(-50) // Sample 3 Retrieved
-//
-//                // Collect Specimen #2
-//                .lineToY(-62)
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//
-//                // Score Specimen #2
-//                .strafeToConstantHeading(new Vector2d(-2.5, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Collect Specimen #3
-//                .strafeToConstantHeading(new Vector2d(40, -58))
-//                .waitSeconds(0.025)
-//                .lineToY(-62)
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//
-//                // Score Specimen #3
-//                .strafeToConstantHeading(new Vector2d(0, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Collect Specimen #4
-//                .strafeToConstantHeading(new Vector2d(40, -58))
-//                .waitSeconds(0.025)
-//                .lineToY(-62)
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//
-//                // Score Specimen #4
-//                .strafeToConstantHeading(new Vector2d(2.5, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Collect Specimen #5
-//                .strafeToConstantHeading(new Vector2d(40, -58))
-//                .waitSeconds(0.025)
-//                .lineToY(-62)
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-//                .stopAndAdd(new VerticalSlideAction(RISE))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-//
-//                // Score Specimen #5
-//                .strafeToConstantHeading(new Vector2d(5, -32))
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
-//
-//                // Park
-//                .strafeToConstantHeading(new Vector2d(62, -60))
-
+                // Robot Setup
+                .stopAndAdd(new ClawAction(ClawState.CLOSE))
+                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
+                .stopAndAdd(new VerticalSlideAction(RISE))
 
                 // Drive To Bar And Score Specimen #1
+                .setReversed(false)
                 .strafeTo(new Vector2d(-6, -30))
                 .waitSeconds(.8)
 
                 // Drive To Collect Samples
                 .setTangent(5)
+                .setReversed(true)
                 .splineToConstantHeading(new Vector2d(24, -48), 0)
-                .splineToConstantHeading(new Vector2d(38, -24), 1.5)
-                .setTangent(1.5)
-                .splineToConstantHeading(new Vector2d(48, -9), 0) // In Front of Sample 1
-                .strafeTo(new Vector2d(48, -56)) // Retrieved Sample 1
+                .setReversed(false)
+                .setTangent(0)
+                .splineToConstantHeading(new Vector2d(36, -24), 1.5)
 
                 .setTangent(1.5)
-                .splineToConstantHeading(new Vector2d(56, -9), 0) // In Front of Sample 2
-                .strafeTo(new Vector2d(56, -56)) // Retrieved Sample 2
+                .splineToConstantHeading(new Vector2d(48, -12), 0) // In Front of Sample 1
+                .setReversed(true)
+                .strafeTo(new Vector2d(48, -50)) // Retrieved Sample 1
 
+                .setReversed(false)
                 .setTangent(1.5)
-                .splineToConstantHeading(new Vector2d(66, -9), 0) // In Front of Sample 3
-                .strafeTo(new Vector2d(66, -56)) // Retrieved Sample 3
+                .splineToConstantHeading(new Vector2d(56, -12), 0) // In Front of Sample 2
+                .setReversed(true)
+                .strafeTo(new Vector2d(56, -50)) // Retrieved Sample 2
+
+                .setReversed(false)
+                .setTangent(1.5)
+                .splineToConstantHeading(new Vector2d(64, -12), 0) // In Front of Sample 3
+                .setReversed(true)
+                .strafeTo(new Vector2d(64, -50)) // Retrieved Sample 3
 
                 // Collect Specimen #2
-                .strafeTo(new Vector2d(62,-62))
+                .strafeTo(new Vector2d(64,-62))
                 .waitSeconds(.5)
 
                 // Score Specimen #2
+                .setReversed(false)
                 .strafeTo(new Vector2d(-3, -30))
                 .waitSeconds(.8)
 
                 // Collect Specimen #3
+                .setReversed(true)
                 .setTangent(30)
                 .splineToConstantHeading(new Vector2d(24, -48), 0)
                 .splineToConstantHeading(new Vector2d(40, -62), 30)
                 .waitSeconds(.5)
 
                 // Score Specimen #3
+                .setReversed(false)
                 .strafeTo(new Vector2d(0, -30))
                 .waitSeconds(.8)
 
                 // Collect Specimen #4
+                .setReversed(true)
                 .setTangent(30)
                 .splineToConstantHeading(new Vector2d(24, -48), 0)
                 .splineToConstantHeading(new Vector2d(40, -62), 30)
                 .waitSeconds(.5)
 
                 // Score Specimen #4
+                .setReversed(false)
                 .strafeTo(new Vector2d(3, -30))
                 .waitSeconds(.8)
 
                 // Collect Specimen #5
+                .setReversed(true)
                 .setTangent(30)
                 .splineToConstantHeading(new Vector2d(24, -48), 0)
                 .splineToConstantHeading(new Vector2d(40, -62), 30)
                 .waitSeconds(.5)
 
                 // Score Specimen #5
+                .setReversed(false)
                 .strafeTo(new Vector2d(6, -30))
                 .waitSeconds(.8)
 
-//                // Park
-//                .strafeTo(new Vector2d(62, -60))
+                // Park
+                .setReversed(true)
+                .strafeTo(new Vector2d(62, -60))
 
                 .build());
     }

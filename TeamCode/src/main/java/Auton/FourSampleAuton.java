@@ -14,38 +14,42 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import java.lang.Math;
-
 import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
 @Config
-@Autonomous(name = "83PtAuton", group = "Auton")
-public class FourSpecAuton extends LinearOpMode {
+@Autonomous(name = "67PtAuton", group = "Auton")
+public class FourSampleAuton extends LinearOpMode {
 
     private final Robot robot = new Robot();
 
-    private final double Power = 1.0;
-    private final double HOLD = 0.0005;
-
     OuttakeState outtakeState = OuttakeState.BASE;
-
     enum OuttakeState {
         BASE,
         COLLECTION,
         SCORING
     }
 
-    ClawState clawState = ClawState.CLOSE;
+    private final int BASE = 0;
+    private final int RAISED = 750;
 
+    private final int RETRACTED = 0;
+    private final int EXTENDED = 900;
+
+    private final double Power = 1.0;
+    private final double HOLD = 0.0005;
+
+    ClawState clawState = ClawState.CLOSE;
     enum ClawState {
         OPEN,
         CLOSE
     }
 
-    private final int BASE = 0;
-    private final int RISE = 500;
-    private final int RAISED = 750;
+    IntakeState intakeState = IntakeState.INACTIVE;
+    enum IntakeState {
+        ACTIVE,
+        INACTIVE
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -53,9 +57,9 @@ public class FourSpecAuton extends LinearOpMode {
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(90));
-        MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 65%
-        MecanumDrive.PARAMS.maxWheelVel = 65;
-        MecanumDrive.PARAMS.maxProfileAccel = 65;
+        MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 50%
+        MecanumDrive.PARAMS.maxWheelVel = 50;
+        MecanumDrive.PARAMS.maxProfileAccel = 50;
 
         waitForStart();
 
@@ -63,68 +67,50 @@ public class FourSpecAuton extends LinearOpMode {
                 // Robot Setup
                 .stopAndAdd(new ClawAction(ClawState.CLOSE))
                 .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-                .stopAndAdd(new VerticalSlideAction(RISE))
+                .stopAndAdd(new VerticalSlideAction(RAISED))
 
-                // Drive To Bar And Score Specimen #1
+                // Drive To Bucket And Score Sample
                 .setReversed(false)
-                .strafeTo(new Vector2d(-6, -30))
-                .waitSeconds(.8)
-
-                // Drive To Collect Samples
-                .setTangent(5)
+                .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(45))
+                .waitSeconds(1)
                 .setReversed(true)
-                .splineToConstantHeading(new Vector2d(24, -48), 0)
-                .setReversed(false)
-                .setTangent(0)
-                .splineToConstantHeading(new Vector2d(36, -24), 1.5)
+                .strafeTo(new Vector2d(-60, -60))
+                .waitSeconds(2)
 
-                .setTangent(1.5)
-                .splineToConstantHeading(new Vector2d(48, -12), 0) // In Front of Sample 1
+                // Collect Sample #1
+                .setReversed(false)
+                .strafeToLinearHeading(new Vector2d(-48, -50), Math.toRadians(90))
+                .waitSeconds(2)
+
+                // Score Sample #1
                 .setReversed(true)
-                .strafeTo(new Vector2d(48, -50)) // Retrieved Sample 1
+                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
+                .waitSeconds(2)
 
+                // Collect Sample #2
                 .setReversed(false)
-                .setTangent(1.5)
-                .splineToConstantHeading(new Vector2d(56, -12), 0) // In Front of Sample 2
+                .strafeToLinearHeading(new Vector2d(-60, -50), Math.toRadians(90))
+                .waitSeconds(2)
+
+                // Score Sample #2
                 .setReversed(true)
-                .strafeTo(new Vector2d(56, -50)) // Retrieved Sample 2
+                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
+                .waitSeconds(2)
 
-                // Collect Specimen #2
-                .strafeTo(new Vector2d(56,-62))
-                .waitSeconds(.5)
-
-                // Score Specimen #2
+                // Collect Sample #3
                 .setReversed(false)
-                .strafeTo(new Vector2d(-3, -30))
-                .waitSeconds(.8)
+                .strafeToLinearHeading(new Vector2d(-60, -50), Math.toRadians(110))
+                .waitSeconds(2)
 
-                // Collect Specimen #3
+                // Score Sample #3
                 .setReversed(true)
-                .setTangent(30)
-                .splineToConstantHeading(new Vector2d(24, -48), 0)
-                .splineToConstantHeading(new Vector2d(40, -62), 30)
-                .waitSeconds(.5)
-
-                // Score Specimen #3
-                .setReversed(false)
-                .strafeTo(new Vector2d(3, -30))
-                .waitSeconds(.8)
-
-                // Collect Specimen #4
-                .setReversed(true)
-                .setTangent(30)
-                .splineToConstantHeading(new Vector2d(24, -48), 0)
-                .splineToConstantHeading(new Vector2d(40, -62), 30)
-                .waitSeconds(.5)
-
-                // Score Specimen #4
-                .setReversed(false)
-                .strafeTo(new Vector2d(6, -30))
-                .waitSeconds(.8)
+                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
+                .waitSeconds(2)
 
                 // Park
-                .setReversed(true)
-                .strafeTo(new Vector2d(62, -60))
+                .setReversed(false)
+                .splineTo(new Vector2d(-24, 0), 0)
+                .waitSeconds(2)
 
                 .build());
     }
@@ -189,17 +175,48 @@ public class FourSpecAuton extends LinearOpMode {
         }
     }
 
-    public class VerticalSlideAction implements Action {
-        private final int targetPosition;
+    public class HorizontalSlideAction implements Action {
+        private final int horizotalTargetPosition;
 
-        public VerticalSlideAction(int position) {
-            this.targetPosition = position;
+        public HorizontalSlideAction(int position) {
+            this.horizotalTargetPosition = position;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            slidesToPosition(targetPosition);
-            telemetryPacket.put("Slide Target Position", targetPosition);
+            slidesToPosition(horizotalTargetPosition);
+            telemetryPacket.put("Slide Target Position", horizotalTargetPosition);
+            return false;
+        }
+
+        private void slidesToPosition(int position) {
+            robot.scoring.horizontalSlideExtension.setTargetPosition(position);
+
+            robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            robot.scoring.horizontalSlideExtension.setPower(Power);
+
+            while (opModeIsActive() && (robot.scoring.horizontalSlideExtension.isBusy())) {
+            }
+
+            robot.scoring.horizontalSlideExtension.setPower(0);
+            robot.scoring.horizontalSlideExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+    }
+
+    public class VerticalSlideAction implements Action {
+        private final int verticalTargetPosition;
+
+        public VerticalSlideAction(int position) {
+            this.verticalTargetPosition = position;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            slidesToPosition(verticalTargetPosition);
+            telemetryPacket.put("Slide Target Position", verticalTargetPosition);
             return false;
         }
 
