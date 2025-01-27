@@ -26,15 +26,11 @@ public class FiveSpecAuton extends LinearOpMode {
     private final double Power = 1.0;
     private final double HOLD = 0.0005;
 
-    OuttakeState outtakeState = OuttakeState.BASE;
-
     enum OuttakeState {
         BASE,
         COLLECTION,
         SCORING
     }
-
-    ClawState clawState = ClawState.CLOSE;
 
     enum ClawState {
         OPEN,
@@ -67,8 +63,12 @@ public class FiveSpecAuton extends LinearOpMode {
                 .setReversed(false)
                 .strafeTo(new Vector2d(-6, -30))
                 .waitSeconds(.8)
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Drive To Collect Samples
+//                .stopAndAdd(new VerticalSlideAction(BASE))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
                 .setTangent(5)
                 .setReversed(true)
                 .splineToConstantHeading(new Vector2d(24, -48), 0)
@@ -96,49 +96,73 @@ public class FiveSpecAuton extends LinearOpMode {
                 // Collect Specimen #2
                 .strafeTo(new Vector2d(64,-62))
                 .waitSeconds(.5)
+//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
 
                 // Score Specimen #2
                 .setReversed(false)
                 .strafeTo(new Vector2d(-3, -30))
                 .waitSeconds(.8)
+//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Collect Specimen #3
+//                .stopAndAdd(new VerticalSlideAction(BASE))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
                 .setReversed(true)
                 .setTangent(30)
                 .splineToConstantHeading(new Vector2d(24, -48), 0)
                 .splineToConstantHeading(new Vector2d(40, -62), 30)
                 .waitSeconds(.5)
+//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
 
                 // Score Specimen #3
                 .setReversed(false)
                 .strafeTo(new Vector2d(0, -30))
                 .waitSeconds(.8)
+//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Collect Specimen #4
+//                .stopAndAdd(new VerticalSlideAction(BASE))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
                 .setReversed(true)
                 .setTangent(30)
                 .splineToConstantHeading(new Vector2d(24, -48), 0)
                 .splineToConstantHeading(new Vector2d(40, -62), 30)
                 .waitSeconds(.5)
+//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
 
                 // Score Specimen #4
                 .setReversed(false)
                 .strafeTo(new Vector2d(3, -30))
                 .waitSeconds(.8)
+//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Collect Specimen #5
+//                .stopAndAdd(new VerticalSlideAction(BASE))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
                 .setReversed(true)
                 .setTangent(30)
                 .splineToConstantHeading(new Vector2d(24, -48), 0)
                 .splineToConstantHeading(new Vector2d(40, -62), 30)
                 .waitSeconds(.5)
+//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
 
                 // Score Specimen #5
                 .setReversed(false)
                 .strafeTo(new Vector2d(6, -30))
                 .waitSeconds(.8)
+//                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Park
+//                .stopAndAdd(new VerticalSlideAction(BASE))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
                 .setReversed(true)
                 .strafeTo(new Vector2d(62, -60))
 
@@ -154,7 +178,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            setOuttakeState(outtakeState);
+            setOuttakeState(targetState);
             telemetryPacket.put("Outtake State", targetState.toString());
             return false;
         }

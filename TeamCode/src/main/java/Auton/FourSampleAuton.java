@@ -7,7 +7,9 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -23,13 +25,6 @@ public class FourSampleAuton extends LinearOpMode {
 
     private final Robot robot = new Robot();
 
-    OuttakeState outtakeState = OuttakeState.BASE;
-    enum OuttakeState {
-        BASE,
-        COLLECTION,
-        SCORING
-    }
-
     private final int BASE = 0;
     private final int RAISED = 750;
 
@@ -39,13 +34,17 @@ public class FourSampleAuton extends LinearOpMode {
     private final double Power = 1.0;
     private final double HOLD = 0.0005;
 
-    ClawState clawState = ClawState.CLOSE;
+    enum OuttakeState {
+        BASE,
+        COLLECTION,
+        SCORING
+    }
+
     enum ClawState {
         OPEN,
         CLOSE
     }
 
-    IntakeState intakeState = IntakeState.INACTIVE;
     enum IntakeState {
         ACTIVE,
         INACTIVE
@@ -61,9 +60,14 @@ public class FourSampleAuton extends LinearOpMode {
         MecanumDrive.PARAMS.maxWheelVel = 50;
         MecanumDrive.PARAMS.maxProfileAccel = 50;
 
+        robot.init(hardwareMap);
+
         waitForStart();
 
-        Actions.runBlocking(Drive.actionBuilder(initialPosition)
+        if (isStopRequested()) return;
+
+        Actions.runBlocking(
+                new SequentialAction(Drive.actionBuilder(initialPosition)
                 // Robot Setup
                 .stopAndAdd(new ClawAction(ClawState.CLOSE))
                 .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
@@ -73,46 +77,82 @@ public class FourSampleAuton extends LinearOpMode {
                 .setReversed(false)
                 .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(45))
                 .waitSeconds(1)
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
                 .setReversed(true)
                 .strafeTo(new Vector2d(-60, -60))
                 .waitSeconds(2)
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Collect Sample #1
                 .setReversed(false)
+                .strafeTo(new Vector2d(-53, -53))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+//                .stopAndAdd(new VerticalSlideAction(BASE))
                 .strafeToLinearHeading(new Vector2d(-48, -50), Math.toRadians(90))
                 .waitSeconds(2)
+//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+//                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
+//                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
+//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
 
                 // Score Sample #1
+//                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
                 .setReversed(true)
                 .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
                 .waitSeconds(2)
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Collect Sample #2
                 .setReversed(false)
+                .strafeTo(new Vector2d(-53, -53))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+//                .stopAndAdd(new VerticalSlideAction(BASE))
                 .strafeToLinearHeading(new Vector2d(-60, -50), Math.toRadians(90))
                 .waitSeconds(2)
+//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+//                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
+//                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
+//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
 
                 // Score Sample #2
+//                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
                 .setReversed(true)
                 .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
                 .waitSeconds(2)
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Collect Sample #3
                 .setReversed(false)
+                .strafeTo(new Vector2d(-53, -53))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+//                .stopAndAdd(new VerticalSlideAction(BASE))
                 .strafeToLinearHeading(new Vector2d(-60, -50), Math.toRadians(110))
                 .waitSeconds(2)
+//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+//                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
+//                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
+//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
 
                 // Score Sample #3
+//                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
                 .setReversed(true)
                 .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
                 .waitSeconds(2)
+//                .stopAndAdd(new VerticalSlideAction(RAISED))
+//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
+//                .stopAndAdd(new ClawAction(ClawState.OPEN))
 
                 // Park
                 .setReversed(false)
                 .splineTo(new Vector2d(-24, 0), 0)
                 .waitSeconds(2)
 
-                .build());
+                .build()));
     }
 
     public class OutTakeAction implements Action {
@@ -124,7 +164,7 @@ public class FourSampleAuton extends LinearOpMode {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            setOuttakeState(outtakeState);
+            setOuttakeState(targetState);
             telemetryPacket.put("Outtake State", targetState.toString());
             return false;
         }
@@ -170,6 +210,34 @@ public class FourSampleAuton extends LinearOpMode {
                     break;
                 case CLOSE:
                     robot.scoring.clawStatus.setPosition(1.00);
+                    break;
+            }
+        }
+    }
+
+    public class IntakeAction implements Action {
+        private final IntakeState targetState;
+
+        public IntakeAction(IntakeState state) {
+            this.targetState = state;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            setIntakeState(targetState);
+            telemetryPacket.put("Intake State", targetState.toString());
+            return false;
+        }
+
+        private void setIntakeState(IntakeState state) {
+            switch (state) {
+                case INACTIVE:
+                    robot.scoring.rollerInOut.setPower(0);
+                    break;
+                case ACTIVE:
+                    robot.scoring.rollerInOut.setPower(1);
+                    int R = robot.scoring.colorSensor1.red(); int G = robot.scoring.colorSensor1.green(); int B = robot.scoring.colorSensor1.blue();
+                    if (R < 50 && G < 50 && B < 50) { setIntakeState(IntakeState.INACTIVE); }
                     break;
             }
         }

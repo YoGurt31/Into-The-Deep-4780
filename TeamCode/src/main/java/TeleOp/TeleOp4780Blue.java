@@ -95,7 +95,7 @@ public class TeleOp4780Blue extends LinearOpMode {
             double correctionBR = 0.0;
 
             if (Math.abs(xAngle) > threshold) {
-                double pitchCorrection = xAngle > 0 ? 0.25 : -0.25;
+                double pitchCorrection = xAngle > 0 ? 0.5 : -0.5;
                 correctionFL += pitchCorrection;
                 correctionFR += pitchCorrection;
                 correctionBL += pitchCorrection;
@@ -103,7 +103,7 @@ public class TeleOp4780Blue extends LinearOpMode {
             }
 
             if (Math.abs(yAngle) > threshold) {
-                double rollCorrection = yAngle > 0 ? 0.25 : -0.25;
+                double rollCorrection = yAngle > 0 ? 0.5 : -0.5;
                 correctionFL += rollCorrection;
                 correctionFR -= rollCorrection;
                 correctionBL -= rollCorrection;
