@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -51,18 +52,27 @@ public class FiveSpecAuton extends LinearOpMode {
         MecanumDrive.PARAMS.maxWheelVel = 80;
         MecanumDrive.PARAMS.maxProfileAccel = 80;
 
+        robot.init(hardwareMap);
+
+        Actions.runBlocking(new ParallelAction(
+                // Robot Setup
+                new ClawAction(ClawState.CLOSE),
+                new OutTakeAction(OuttakeState.SCORING),
+                new VerticalSlideAction(RAISED)
+                )
+        );
+
         waitForStart();
 
-        Actions.runBlocking(Drive.actionBuilder(initialPosition)
-                // Robot Setup
-                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-                .stopAndAdd(new VerticalSlideAction(RISE))
+        if (isStopRequested()) return;
 
+        Actions.runBlocking(Drive.actionBuilder(initialPosition)
                 // Drive To Bar And Score Specimen #1
                 .setReversed(false)
                 .strafeTo(new Vector2d(-6, -30))
                 .waitSeconds(.8)
+//                .afterTime(1, new VerticalSlideAction(RAISED))
+//                .afterTime(1.2, new ClawAction(ClawState.OPEN))
 //                .stopAndAdd(new VerticalSlideAction(RAISED))
 //                .stopAndAdd(new ClawAction(ClawState.OPEN))
 

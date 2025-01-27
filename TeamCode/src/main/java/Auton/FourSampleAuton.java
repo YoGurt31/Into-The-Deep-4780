@@ -62,17 +62,19 @@ public class FourSampleAuton extends LinearOpMode {
 
         robot.init(hardwareMap);
 
+        Actions.runBlocking(new ParallelAction(
+                // Robot Setup
+                new ClawAction(ClawState.CLOSE),
+                new OutTakeAction(OuttakeState.SCORING),
+                new VerticalSlideAction(RAISED)
+                )
+        );
+
         waitForStart();
 
         if (isStopRequested()) return;
 
-        Actions.runBlocking(
-                new SequentialAction(Drive.actionBuilder(initialPosition)
-                // Robot Setup
-                .stopAndAdd(new ClawAction(ClawState.CLOSE))
-                .stopAndAdd(new OutTakeAction(OuttakeState.SCORING))
-                .stopAndAdd(new VerticalSlideAction(RAISED))
-
+        Actions.runBlocking(Drive.actionBuilder(initialPosition)
                 // Drive To Bucket And Score Sample
                 .setReversed(false)
                 .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(45))
@@ -152,7 +154,7 @@ public class FourSampleAuton extends LinearOpMode {
                 .splineTo(new Vector2d(-24, 0), 0)
                 .waitSeconds(2)
 
-                .build()));
+                .build());
     }
 
     public class OutTakeAction implements Action {

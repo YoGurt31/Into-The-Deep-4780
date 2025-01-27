@@ -216,17 +216,23 @@ public class TeleOp4780Blue extends LinearOpMode {
             boolean isIntakingRed      = Red2 > 250 && Green2 < 225 && Blue2 < 125;
             boolean isIntakingBlue     = Red2 < 125 && Green2 < 225 && Blue2 > 250;
 
-            RevBlinkinLedDriver.BlinkinPattern currentPattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_WHITE;
+            boolean isIntaked          = Red1 < 25  && Green1 < 25  && Blue1 < 25;
+
+            RevBlinkinLedDriver.BlinkinPattern currentPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_WHITE;
             RevBlinkinLedDriver.BlinkinPattern targetPattern;
 
             ElapsedTime ColorTimer = new ElapsedTime();
 
             if (isIntakingYellow || isIntakingBlue) {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD;
             } else if (isIntakingRed) {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_RED;
             } else {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_WHITE;
+            }
+
+            if (isIntaked) {
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_BLUE;
             }
 
             if (currentPattern != targetPattern || ColorTimer.seconds() > 2.5) {

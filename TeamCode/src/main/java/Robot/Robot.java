@@ -118,13 +118,13 @@ public class Robot {
 
             intakePivot = hwMap.servo.get("intakePivot");                // Config 0 (Control)
 
-            outtakeArmRotation = hwMap.servo.get("outtakeArmRotation");  // Config 0 (Expansion)
+            outtakeArmRotation = hwMap.servo.get("outtakeArmRotation");  // Config 2 (Control)
 
-            clawPrimaryPivot = hwMap.servo.get("clawPrimaryPivot");      // Config 2 (Expansion)
+            clawPrimaryPivot = hwMap.servo.get("clawPrimaryPivot");      // Config 0 (Expansion)
 
-            clawStatus = hwMap.servo.get("clawStatus");                  // Config 3 (Expansion)
+            clawStatus = hwMap.servo.get("clawStatus");                  // Config 2 (Expansion)
 
-            blinkinLedDriver = hwMap.get(RevBlinkinLedDriver.class, "LED");  // Config 0 (Control)
+            blinkinLedDriver = hwMap.get(RevBlinkinLedDriver.class, "LED");  // Config 5 (Expansion)
             blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_COLOR_WAVES);
 
             colorSensor1 = hwMap.get(ColorSensor.class, "colorSensor1");       // Config I2C Bus 1 (Control)  (Checks If Sample Is Properly Intaked)
