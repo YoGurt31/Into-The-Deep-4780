@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import Robot.Robot;
 
 @TeleOp(name = "Blue", group = "TeleOp")
@@ -45,6 +47,9 @@ public class TeleOp4780Blue extends LinearOpMode {
 
         waitForStart();
 
+        double xOffset = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES);
+        double yOffset = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES);
+
         while (opModeIsActive()) {
 
             robot.driveTrain.runWithoutDriveTrainEncoders();
@@ -78,6 +83,42 @@ public class TeleOp4780Blue extends LinearOpMode {
             if (strafe == 0 && drive == 0) {
                 robot.driveTrain.brake();
             }
+
+            // Anti-Tipping Algorithm
+            double xAngle = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES) - xOffset;
+            double yAngle = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES) - yOffset;
+
+            double threshold = 7.50;
+            double correctionFL = 0.0;
+            double correctionFR = 0.0;
+            double correctionBL = 0.0;
+            double correctionBR = 0.0;
+
+            if (Math.abs(xAngle) > threshold) {
+                double pitchCorrection = xAngle > 0 ? 0.25 : -0.25;
+                correctionFL += pitchCorrection;
+                correctionFR += pitchCorrection;
+                correctionBL += pitchCorrection;
+                correctionBR += pitchCorrection;
+            }
+
+            if (Math.abs(yAngle) > threshold) {
+                double rollCorrection = yAngle > 0 ? 0.25 : -0.25;
+                correctionFL += rollCorrection;
+                correctionFR -= rollCorrection;
+                correctionBL -= rollCorrection;
+                correctionBR += rollCorrection;
+            }
+
+            if (correctionFL != 0.0 || correctionFR != 0.0 || correctionBL != 0.0 || correctionBR != 0.0) {
+                robot.driveTrain.mecDrive(correctionFL, correctionFR, correctionBL, correctionBR);
+            }
+
+            // Anti-Tipping Telemetry
+            telemetry.addLine("----- Anti-Tipping Algorithm -----");
+            telemetry.addData("X-Angle (Pitch)", "%.2f degrees", xAngle);
+            telemetry.addData("Y-Angle (Roll)", "%.2f degrees", yAngle);
+            telemetry.update();
 
             // Drive Telemetry
             telemetry.addLine("----- Drive Info -----");
