@@ -13,12 +13,14 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
+@Disabled
 @Config
 @Autonomous(name = "67PtAuton", group = "Auton")
 public class FourSampleAuton extends LinearOpMode {

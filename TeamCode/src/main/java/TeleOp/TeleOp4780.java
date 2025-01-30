@@ -80,11 +80,7 @@ public class TeleOp4780 extends LinearOpMode {
                 backRightPower  /= power + Math.abs(turn);
             }
 
-            if (gamepad1.right_stick_button) {
-                robot.driveTrain.mecDrive(frontLeftPower * 0.5, frontRightPower * 0.5, backLeftPower * 0.5, backRightPower * 0.5);
-            } else {
-                robot.driveTrain.mecDrive(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
-            }
+            robot.driveTrain.mecDrive(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
 
             if (strafe == 0 && drive == 0) {
                 robot.driveTrain.brake();
@@ -94,14 +90,14 @@ public class TeleOp4780 extends LinearOpMode {
 //            double xAngle = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES) - xOffset;
 //            double yAngle = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES) - yOffset;
 //
-//            double threshold = 7.50;
+//            double threshold = 2.5;
 //            double correctionFL = 0.0;
 //            double correctionFR = 0.0;
 //            double correctionBL = 0.0;
 //            double correctionBR = 0.0;
 //
 //            if (Math.abs(xAngle) > threshold) {
-//                double pitchCorrection = xAngle > 0 ? 0.5 : -0.5;
+//                double pitchCorrection = xAngle > 0 ? 0.75 : -0.75;
 //                correctionFL += pitchCorrection;
 //                correctionFR += pitchCorrection;
 //                correctionBL += pitchCorrection;
@@ -109,7 +105,7 @@ public class TeleOp4780 extends LinearOpMode {
 //            }
 //
 //            if (Math.abs(yAngle) > threshold) {
-//                double rollCorrection = yAngle > 0 ? 0.5 : -0.5;
+//                double rollCorrection = yAngle > 0 ? 0.75 : -0.75;
 //                correctionFL += rollCorrection;
 //                correctionFR -= rollCorrection;
 //                correctionBL -= rollCorrection;
