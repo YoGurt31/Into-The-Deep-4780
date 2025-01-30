@@ -26,10 +26,13 @@ public class FourSampleAuton extends LinearOpMode {
     private final Robot robot = new Robot();
 
     private final int BASE = 0;
-    private final int RAISED = 750;
+    private final int RAISED = 1500;
 
     private final int RETRACTED = 0;
     private final int EXTENDED = 900;
+
+    private final double OPEN = 0.25;
+    private final double CLOSE = 0.75;
 
     private final double Power = 1.0;
     private final double HOLD = 0.0005;
@@ -38,11 +41,6 @@ public class FourSampleAuton extends LinearOpMode {
         BASE,
         COLLECTION,
         SCORING
-    }
-
-    enum ClawState {
-        OPEN,
-        CLOSE
     }
 
     enum IntakeState {
@@ -55,7 +53,7 @@ public class FourSampleAuton extends LinearOpMode {
         telemetry.addLine("Initializing...");
         telemetry.update();
 
-        Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(90));
+        Pose2d initialPosition = new Pose2d(-39, -62, Math.toRadians(90));
         MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 50%
         MecanumDrive.PARAMS.maxWheelVel = 50;
         MecanumDrive.PARAMS.maxProfileAccel = 50;
@@ -64,7 +62,7 @@ public class FourSampleAuton extends LinearOpMode {
 
         Actions.runBlocking(new ParallelAction(
                 // Robot Setup
-                new ClawAction(ClawState.CLOSE),
+                new ClawAction(CLOSE),
                 new OutTakeAction(OuttakeState.SCORING),
                 new VerticalSlideAction(RAISED)
                 )
@@ -74,7 +72,7 @@ public class FourSampleAuton extends LinearOpMode {
 
         if (isStopRequested()) return;
 
-        Actions.runBlocking(Drive.actionBuilder(initialPosition)
+        Actions.runBlocking(new SequentialAction(Drive.actionBuilder(initialPosition)
                 // Drive To Bucket And Score Sample
                 .setReversed(false)
                 .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(45))
@@ -145,16 +143,16 @@ public class FourSampleAuton extends LinearOpMode {
                 .setReversed(true)
                 .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
                 .waitSeconds(2)
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
+                .stopAndAdd(new VerticalSlideAction(RAISED))
+                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
+                .stopAndAdd(new ClawAction(OPEN))
 
                 // Park
                 .setReversed(false)
                 .splineTo(new Vector2d(-24, 0), 0)
                 .waitSeconds(2)
 
-                .build());
+                .build()));
     }
 
     public class OutTakeAction implements Action {
@@ -192,28 +190,21 @@ public class FourSampleAuton extends LinearOpMode {
     }
 
     public class ClawAction implements Action {
-        private final ClawState targetState;
+        private final double targetState;
 
-        public ClawAction(ClawState state) {
-            this.targetState = state;
+        public ClawAction(double STATE) {
+            this.targetState = STATE;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             setClawState(targetState);
-            telemetryPacket.put("Claw State", targetState.toString());
+            telemetryPacket.put("Claw State", targetState);
             return false;
         }
 
-        private void setClawState(ClawState state) {
-            switch (state) {
-                case OPEN:
-                    robot.scoring.clawStatus.setPosition(0.25);
-                    break;
-                case CLOSE:
-                    robot.scoring.clawStatus.setPosition(1.00);
-                    break;
-            }
+        private void setClawState(double STATE) {
+            robot.scoring.clawStatus.setPosition(STATE);
         }
     }
 
@@ -238,8 +229,11 @@ public class FourSampleAuton extends LinearOpMode {
                     break;
                 case ACTIVE:
                     robot.scoring.rollerInOut.setPower(1);
-                    int R = robot.scoring.colorSensor1.red(); int G = robot.scoring.colorSensor1.green(); int B = robot.scoring.colorSensor1.blue();
-                    if (R < 50 && G < 50 && B < 50) { setIntakeState(IntakeState.INACTIVE); }
+                    int R = robot.scoring.colorSensor.red(); int G = robot.scoring.colorSensor.green(); int B = robot.scoring.colorSensor.blue();
+                    boolean isIntakedYellow   = R > 2500 && G > 3000 && B < 2500;
+                    boolean isIntakedRed      = R > 1500 && G < 3000 && B < 2000;
+                    boolean isIntakedBlue     = R < 2000 && G < 3000 && B > 1500;
+                    if (isIntakedYellow || isIntakedBlue || isIntakedRed) { setIntakeState(IntakeState.INACTIVE); }
                     break;
             }
         }

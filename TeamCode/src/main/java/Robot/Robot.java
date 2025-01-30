@@ -93,7 +93,7 @@ public class Robot {
         public DcMotor horizontalSlideExtension, verticalSlideExtension1, verticalSlideExtension2, rollerInOut;
         public Servo intakePivot, outtakeArmRotation, clawPrimaryPivot, clawStatus;
         public RevBlinkinLedDriver blinkinLedDriver;
-        public ColorSensor colorSensor1, colorSensor2, colorSensor3;
+        public ColorSensor colorSensor;
 
         public void init(HardwareMap hwMap) {
             horizontalSlideExtension = hwMap.dcMotor.get("horizontalSlideExtension");  // Config 0
@@ -116,25 +116,19 @@ public class Robot {
             rollerInOut.setDirection(DcMotorSimple.Direction.FORWARD);
             rollerInOut.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            intakePivot = hwMap.servo.get("intakePivot");                // Config 0 (Control)
+            intakePivot = hwMap.servo.get("intakePivot");                // Config 2 (Control)
 
-            outtakeArmRotation = hwMap.servo.get("outtakeArmRotation");  // Config 2 (Control)
+            outtakeArmRotation = hwMap.servo.get("outtakeArmRotation");  // Config 1 (Expansion)
 
-            clawPrimaryPivot = hwMap.servo.get("clawPrimaryPivot");      // Config 0 (Expansion)
+            clawPrimaryPivot = hwMap.servo.get("clawPrimaryPivot");      // Config 3 (Expansion)
 
-            clawStatus = hwMap.servo.get("clawStatus");                  // Config 2 (Expansion)
+            clawStatus = hwMap.servo.get("clawStatus");                  // Config 5 (Expansion)
 
-            blinkinLedDriver = hwMap.get(RevBlinkinLedDriver.class, "LED");  // Config 5 (Expansion)
+            blinkinLedDriver = hwMap.get(RevBlinkinLedDriver.class, "LED");  // Config 0 (Control)
             blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_COLOR_WAVES);
 
-            colorSensor1 = hwMap.get(ColorSensor.class, "colorSensor1");       // Config I2C Bus 1 (Control)  (Checks If Sample Is Properly Intaked)
-            colorSensor1.enableLed(true);
-
-            colorSensor2 = hwMap.get(ColorSensor.class, "colorSensor2");       // Config I2C Bus 2 (Control)  (Checks Which Sample Is Being Intaked)
-            colorSensor2.enableLed(true);
-
-            colorSensor3 = hwMap.get(ColorSensor.class, "colorSensor3");       // Config I2C Bus 3 (Control)
-            colorSensor3.enableLed(true);
+            colorSensor = hwMap.get(ColorSensor.class, "colorSensor");       // Config I2C Bus 3 (Control)  (Checks If Sample Is Properly Intaked)
+            colorSensor.enableLed(true);
         }
 
         public void runScoringEncoders() {

@@ -7,21 +7,20 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import Robot.Robot;
 
-@TeleOp(name = "Blue", group = "TeleOp")
-public class TeleOp4780Blue extends LinearOpMode {
+@TeleOp(name = "TeleOp", group = "TeleOp")
+public class TeleOp4780 extends LinearOpMode {
 
     private final Robot robot = new Robot();
 
     OuttakeState outtakeState = OuttakeState.COLLECTION;
 
     private final double intakeLiftedPosition = 0.00;
-    private final double intakeLoweredPosition = 0.40;
+    private final double intakeLoweredPosition = 0.20;
 
     boolean lastAButtonState = false;
     boolean lastBButtonState = false;
@@ -32,6 +31,9 @@ public class TeleOp4780Blue extends LinearOpMode {
         COLLECTION,
         SCORING
     }
+
+    RevBlinkinLedDriver.BlinkinPattern currentPattern;
+    RevBlinkinLedDriver.BlinkinPattern targetPattern;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -78,47 +80,45 @@ public class TeleOp4780Blue extends LinearOpMode {
                 backRightPower  /= power + Math.abs(turn);
             }
 
-            robot.driveTrain.mecDrive(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+            if (gamepad1.right_stick_button) {
+                robot.driveTrain.mecDrive(frontLeftPower * 0.5, frontRightPower * 0.5, backLeftPower * 0.5, backRightPower * 0.5);
+            } else {
+                robot.driveTrain.mecDrive(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+            }
 
             if (strafe == 0 && drive == 0) {
                 robot.driveTrain.brake();
             }
 
-            // Anti-Tipping Algorithm
-            double xAngle = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES) - xOffset;
-            double yAngle = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES) - yOffset;
-
-            double threshold = 7.50;
-            double correctionFL = 0.0;
-            double correctionFR = 0.0;
-            double correctionBL = 0.0;
-            double correctionBR = 0.0;
-
-            if (Math.abs(xAngle) > threshold) {
-                double pitchCorrection = xAngle > 0 ? 0.5 : -0.5;
-                correctionFL += pitchCorrection;
-                correctionFR += pitchCorrection;
-                correctionBL += pitchCorrection;
-                correctionBR += pitchCorrection;
-            }
-
-            if (Math.abs(yAngle) > threshold) {
-                double rollCorrection = yAngle > 0 ? 0.5 : -0.5;
-                correctionFL += rollCorrection;
-                correctionFR -= rollCorrection;
-                correctionBL -= rollCorrection;
-                correctionBR += rollCorrection;
-            }
-
-            if (correctionFL != 0.0 || correctionFR != 0.0 || correctionBL != 0.0 || correctionBR != 0.0) {
-                robot.driveTrain.mecDrive(correctionFL, correctionFR, correctionBL, correctionBR);
-            }
-
-            // Anti-Tipping Telemetry
-            telemetry.addLine("----- Anti-Tipping Algorithm -----");
-            telemetry.addData("X-Angle (Pitch)", "%.2f degrees", xAngle);
-            telemetry.addData("Y-Angle (Roll)", "%.2f degrees", yAngle);
-            telemetry.update();
+//            // Anti-Tipping Algorithm
+//            double xAngle = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getPitch(AngleUnit.DEGREES) - xOffset;
+//            double yAngle = robot.driveTrain.IMU.getRobotYawPitchRollAngles().getRoll(AngleUnit.DEGREES) - yOffset;
+//
+//            double threshold = 7.50;
+//            double correctionFL = 0.0;
+//            double correctionFR = 0.0;
+//            double correctionBL = 0.0;
+//            double correctionBR = 0.0;
+//
+//            if (Math.abs(xAngle) > threshold) {
+//                double pitchCorrection = xAngle > 0 ? 0.5 : -0.5;
+//                correctionFL += pitchCorrection;
+//                correctionFR += pitchCorrection;
+//                correctionBL += pitchCorrection;
+//                correctionBR += pitchCorrection;
+//            }
+//
+//            if (Math.abs(yAngle) > threshold) {
+//                double rollCorrection = yAngle > 0 ? 0.5 : -0.5;
+//                correctionFL += rollCorrection;
+//                correctionFR -= rollCorrection;
+//                correctionBL -= rollCorrection;
+//                correctionBR += rollCorrection;
+//            }
+//
+//            if (correctionFL != 0.0 || correctionFR != 0.0 || correctionBL != 0.0 || correctionBR != 0.0) {
+//                robot.driveTrain.mecDrive(correctionFL, correctionFR, correctionBL, correctionBR);
+//            }
 
             // Drive Telemetry
             telemetry.addLine("----- Drive Info -----");
@@ -204,55 +204,39 @@ public class TeleOp4780Blue extends LinearOpMode {
 
 
             // Intaked Colored Specimen Indicator
-            int Red1 = robot.scoring.colorSensor1.red();
-            int Green1 = robot.scoring.colorSensor1.green();
-            int Blue1 = robot.scoring.colorSensor1.blue();
+            int Red1 = robot.scoring.colorSensor.red();
+            int Green1 = robot.scoring.colorSensor.green();
+            int Blue1 = robot.scoring.colorSensor.blue();
 
-            int Red2 = robot.scoring.colorSensor2.red();
-            int Green2 = robot.scoring.colorSensor2.green();
-            int Blue2 = robot.scoring.colorSensor2.blue();
+            boolean isIntakedYellow   = Red1 > 2500 && Green1 > 3000 && Blue1 < 2500;
+            boolean isIntakedRed      = Red1 > 1500 && Green1 < 3000 && Blue1 < 2000;
+            boolean isIntakedBlue     = Red1 < 2000 && Green1 < 3000 && Blue1 > 1500;
 
-            boolean isIntakingYellow   = Red2 > 200 && Green2 > 300 && Blue2 < 200;
-            boolean isIntakingRed      = Red2 > 250 && Green2 < 225 && Blue2 < 125;
-            boolean isIntakingBlue     = Red2 < 125 && Green2 < 225 && Blue2 > 250;
-
-            boolean isIntaked          = Red1 < 25  && Green1 < 25  && Blue1 < 25;
-
-            RevBlinkinLedDriver.BlinkinPattern currentPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_WHITE;
-            RevBlinkinLedDriver.BlinkinPattern targetPattern;
-
-            ElapsedTime ColorTimer = new ElapsedTime();
-
-            if (isIntakingYellow || isIntakingBlue) {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD;
-            } else if (isIntakingRed) {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_RED;
+            if (isIntakedYellow) {
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+            } else if (isIntakedBlue) {
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+            } else if (isIntakedRed) {
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.RED;
             } else {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_WHITE;
+                targetPattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
             }
 
-            if (isIntaked) {
-                targetPattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_BLUE;
-            }
-
-            if (currentPattern != targetPattern || ColorTimer.seconds() > 2.5) {
+            if (currentPattern != targetPattern) {
                 currentPattern = targetPattern;
                 robot.scoring.blinkinLedDriver.setPattern(currentPattern);
-                ColorTimer.reset();
             }
 
-            telemetry.addLine("----- Color Sensor(s) Info -----");
-            telemetry.addData("Red 1: ", Red1);
-            telemetry.addData("Green 1: ", Green1);
-            telemetry.addData("Blue 1: ", Blue1);
+            telemetry.addLine("----- Color Sensor(s) / LED Info -----");
+            telemetry.addData("LED Pattern", currentPattern);
             telemetry.addLine();
-            telemetry.addData("Red 2: ", Red2);
-            telemetry.addData("Green 2: ", Green2);
-            telemetry.addData("Blue 2: ", Blue2);
+            telemetry.addData("Red 1  ", Red1);
+            telemetry.addData("Green 1", Green1);
+            telemetry.addData("Blue 1 ", Blue1);
             telemetry.addLine();
-            telemetry.addData("Is Yellow: ", isIntakingYellow);
-            telemetry.addData("Is Blue: ", isIntakingBlue);
-            telemetry.addData("Is Red: ", isIntakingRed);
+            telemetry.addData("Intaked Yellow", isIntakedYellow);
+            telemetry.addData("Intaked Blue  ", isIntakedBlue);
+            telemetry.addData("Intaked Red   ", isIntakedRed);
 
             telemetry.addLine("\n");
 
