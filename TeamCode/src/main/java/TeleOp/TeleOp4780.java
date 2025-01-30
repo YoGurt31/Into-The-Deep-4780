@@ -2,6 +2,10 @@
 
 package TeleOp;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -58,9 +62,9 @@ public class TeleOp4780 extends LinearOpMode {
             robot.scoring.runScoringEncoders();
 
             // Drive System
-            double drive  = -gamepad1.left_stick_y;
+            double drive = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
-            double turn   = -gamepad1.right_stick_x;
+            double turn = -gamepad1.right_stick_x;
 
             double theta = Math.atan2(drive, strafe);
             double power = Math.hypot(strafe, drive);
@@ -68,16 +72,16 @@ public class TeleOp4780 extends LinearOpMode {
             double cos = Math.cos(theta - Math.PI / 4);
             double max = Math.max(Math.abs(sin), Math.abs(cos));
 
-            double frontLeftPower  = power * cos / max - turn;
+            double frontLeftPower = power * cos / max - turn;
             double frontRightPower = power * sin / max + turn;
-            double backLeftPower   = power * sin / max - turn;
-            double backRightPower  = power * cos / max + turn;
+            double backLeftPower = power * sin / max - turn;
+            double backRightPower = power * cos / max + turn;
 
             if (power + Math.abs(turn) > 1) {
-                frontLeftPower  /= power + Math.abs(turn);
+                frontLeftPower /= power + Math.abs(turn);
                 frontRightPower /= power + Math.abs(turn);
-                backLeftPower   /= power + Math.abs(turn);
-                backRightPower  /= power + Math.abs(turn);
+                backLeftPower /= power + Math.abs(turn);
+                backRightPower /= power + Math.abs(turn);
             }
 
             robot.driveTrain.mecDrive(frontLeftPower, frontRightPower, backLeftPower, backRightPower);
@@ -130,27 +134,26 @@ public class TeleOp4780 extends LinearOpMode {
             telemetry.addLine("\n");
 
 
-
             // Horizontal Slide Extension Control
             double horizontalSlideExtensionPower = 0;
-            if (gamepad1.dpad_down)  { horizontalSlideExtensionPower = -1.0; }
-            if (gamepad1.dpad_up) { horizontalSlideExtensionPower =  1.0; }
+            if (gamepad1.dpad_down) {
+                horizontalSlideExtensionPower = -1.0;
+            }
+            if (gamepad1.dpad_up) {
+                horizontalSlideExtensionPower = 1.0;
+            }
             int currentHorizontalSlidePosition = robot.scoring.horizontalSlideExtension.getCurrentPosition();
-            int horizontalSlideExtensionMax  = 2500;  // Max Value
-            int horizontalSlideExtensionMin  =  -50;  // Min Value
-            int horizontalToleranceThreshold =   25;  // Threshold Value (Adjust)
+            int horizontalSlideExtensionMax = 2500;  // Max Value
+            int horizontalSlideExtensionMin = -50;  // Min Value
+            int horizontalToleranceThreshold = 25;  // Threshold Value (Adjust)
 
             if (currentHorizontalSlidePosition < horizontalSlideExtensionMax - horizontalToleranceThreshold) {
-                double adjustedPower = horizontalSlideExtensionPower * (1 - (double)(currentHorizontalSlidePosition - (horizontalSlideExtensionMax - horizontalToleranceThreshold)) / horizontalToleranceThreshold);
+                double adjustedPower = horizontalSlideExtensionPower * (1 - (double) (currentHorizontalSlidePosition - (horizontalSlideExtensionMax - horizontalToleranceThreshold)) / horizontalToleranceThreshold);
                 robot.scoring.horizontalSlideExtension.setPower(Math.min(horizontalSlideExtensionPower, adjustedPower));
-            }
-
-            else if (robot.scoring.horizontalSlideExtension.getCurrentPosition() > horizontalSlideExtensionMin) {
-                double adjustedPower = horizontalSlideExtensionPower * (1 - (double)((horizontalSlideExtensionMin + horizontalToleranceThreshold) - currentHorizontalSlidePosition) / horizontalToleranceThreshold);
+            } else if (robot.scoring.horizontalSlideExtension.getCurrentPosition() > horizontalSlideExtensionMin) {
+                double adjustedPower = horizontalSlideExtensionPower * (1 - (double) ((horizontalSlideExtensionMin + horizontalToleranceThreshold) - currentHorizontalSlidePosition) / horizontalToleranceThreshold);
                 robot.scoring.horizontalSlideExtension.setPower(Math.max(horizontalSlideExtensionPower, adjustedPower));
-            }
-
-            else {
+            } else {
                 robot.scoring.horizontalSlideExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 robot.scoring.horizontalSlideExtension.setPower(0);
             }
@@ -160,7 +163,6 @@ public class TeleOp4780 extends LinearOpMode {
             telemetry.addData("Position", "%d", robot.scoring.horizontalSlideExtension.getCurrentPosition());
 
             telemetry.addLine("\n");
-
 
 
             // Intake Roller Control
@@ -198,15 +200,14 @@ public class TeleOp4780 extends LinearOpMode {
             telemetry.addLine("\n");
 
 
-
             // Intaked Colored Specimen Indicator
             int Red1 = robot.scoring.colorSensor.red();
             int Green1 = robot.scoring.colorSensor.green();
             int Blue1 = robot.scoring.colorSensor.blue();
 
-            boolean isIntakedYellow   = Red1 > 2500 && Green1 > 3000 && Blue1 < 2500;
-            boolean isIntakedRed      = Red1 > 1500 && Green1 < 3000 && Blue1 < 2000;
-            boolean isIntakedBlue     = Red1 < 2000 && Green1 < 3000 && Blue1 > 1500;
+            boolean isIntakedYellow = Red1 > 2500 && Green1 > 3000 && Blue1 < 2500;
+            boolean isIntakedRed = Red1 > 1500 && Green1 < 3000 && Blue1 < 2000;
+            boolean isIntakedBlue = Red1 < 2000 && Green1 < 3000 && Blue1 > 1500;
 
             if (isIntakedYellow) {
                 targetPattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
@@ -237,12 +238,11 @@ public class TeleOp4780 extends LinearOpMode {
             telemetry.addLine("\n");
 
 
-
             // Vertical Slide Extension Control
             double verticalSlideExtensionPower = gamepad1.left_trigger - gamepad1.right_trigger;
             int currentVerticalSlidePosition = (robot.scoring.verticalSlideExtension1.getCurrentPosition() + robot.scoring.verticalSlideExtension2.getCurrentPosition()) / 2;
-            int verticalSlideExtensionMin  =  -75;  // Min Value
-            int verticalToleranceThreshold =   25;  // Threshold Value (Adjust)
+            int verticalSlideExtensionMin = -75;  // Min Value
+            int verticalToleranceThreshold = 25;  // Threshold Value (Adjust)
             double slowFactor = 0.75;
 
             final double HOLD = 0.0005;
@@ -252,9 +252,7 @@ public class TeleOp4780 extends LinearOpMode {
                 robot.scoring.verticalSlideExtension1.setPower(HOLD);
                 robot.scoring.verticalSlideExtension2.setPower(HOLD);
                 Holding = true;
-            }
-
-            else if (verticalSlideExtensionPower != 0 && currentVerticalSlidePosition > verticalSlideExtensionMin) {
+            } else if (verticalSlideExtensionPower != 0 && currentVerticalSlidePosition > verticalSlideExtensionMin) {
                 if (currentVerticalSlidePosition <= verticalToleranceThreshold) {
                     double adjustedPower = verticalSlideExtensionPower * slowFactor;
                     robot.scoring.verticalSlideExtension1.setPower(adjustedPower);
@@ -263,9 +261,7 @@ public class TeleOp4780 extends LinearOpMode {
                     robot.scoring.verticalSlideExtension1.setPower(verticalSlideExtensionPower);
                     robot.scoring.verticalSlideExtension2.setPower(verticalSlideExtensionPower);
                 }
-            }
-
-            else {
+            } else {
                 robot.scoring.verticalSlideExtension1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 robot.scoring.verticalSlideExtension2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 robot.scoring.verticalSlideExtension1.setPower(0);
@@ -278,7 +274,6 @@ public class TeleOp4780 extends LinearOpMode {
             telemetry.addData("Position", "%d", currentVerticalSlidePosition);
 
             telemetry.addLine("\n");
-
 
 
             // Outtake System Control

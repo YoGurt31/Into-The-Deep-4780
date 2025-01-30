@@ -22,9 +22,9 @@ import RoadRunner.messages.ThreeDeadWheelInputsMessage;
 @Config
 public final class ThreeDeadWheelLocalizer implements Localizer {
     public static class Params {
-        public double par0YTicks = -3803.025623916538; // y position of the first parallel encoder (in tick units)
-        public double par1YTicks = 3293.9324843948834; // y position of the second parallel encoder (in tick units)
-        public double perpXTicks = 2004.5814032596572; // x position of the perpendicular encoder (in tick units)
+        public double par0YTicks = -3851.181530421327; // y position of the first parallel encoder (in tick units)
+        public double par1YTicks = 3250.8251122536444; // y position of the second parallel encoder (in tick units)
+        public double perpXTicks = 1976.0710205035568; // x position of the perpendicular encoder (in tick units)
     }
 
     public static Params PARAMS = new Params();

@@ -20,14 +20,11 @@ import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
 @Config
-@Autonomous(name = "100PtAuton", group = "Auton")
+@Autonomous(name = "Specimen", group = "Auton")
 public class FiveSpecAuton extends LinearOpMode {
 
     private final Robot robot = new Robot();
     private MecanumDrive Drive;
-
-    private final double Power = 1.0;
-    private final double HOLD = 0.0005;
 
     enum OuttakeState {
         BASE,
@@ -40,9 +37,7 @@ public class FiveSpecAuton extends LinearOpMode {
     private final int RAISED = 750;
 
     private final int RETRACTED = 0;
-    private final int EXTENDED1 = 500;
-    private final int EXTENDED2 = 700;
-    private final int EXTENDED3 = 900;
+    private final int EXTENDED  = 900;
 
     private final double OPEN = 0.25;
     private final double CLOSE = 0.75;
@@ -53,9 +48,7 @@ public class FiveSpecAuton extends LinearOpMode {
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(90));
-        Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 80%
-        MecanumDrive.PARAMS.maxWheelVel = 80;
-        MecanumDrive.PARAMS.maxProfileAccel = 80;
+        Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 100%
 
         robot.init(hardwareMap);
 
@@ -75,8 +68,8 @@ public class FiveSpecAuton extends LinearOpMode {
                 // Drive To Bar And Score Specimen #1
                 new ParallelAction(
                         Drive.actionBuilder(initialPosition)
-                                .setReversed(false)
-                                .strafeTo(new Vector2d(-6, -30))
+//                                .setReversed(false)
+                                .strafeTo(new Vector2d(-6, -24))
                                 .build(),
                         new VerticalSlideAction(RISE)
                 ),
@@ -91,30 +84,30 @@ public class FiveSpecAuton extends LinearOpMode {
 
 
                 // Move to Sample Collection Zone
-                Drive.actionBuilder(new Pose2d(-6, -30, Math.toRadians(90)))
-                        .setReversed(true)
+                Drive.actionBuilder(new Pose2d(-6, -24, Math.toRadians(90)))
+//                        .setReversed(true)
                         .setTangent(5)
-                        .splineToLinearHeading(new Pose2d(30, -40, Math.toRadians(55)), .8)
+                        .splineToLinearHeading(new Pose2d(33, -40, Math.toRadians(60)), .8)
                         .build(),
 
 
                 // Sweep Samples
                 new SequentialAction(
-                        new HorizontalSlideAction(EXTENDED1),
-                        Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(55)))
-                                .turnTo(Math.toRadians(-35))
-                                .turnTo(Math.toRadians(45))
+                        new HorizontalSlideAction(EXTENDED),
+                        Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(60)))
+                                .turnTo(Math.toRadians(-50))
+                                .turnTo(Math.toRadians(60))
                                 .build(),
 
-                        new HorizontalSlideAction(EXTENDED2),
-                        Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(45)))
-                                .turnTo(Math.toRadians(-35))
-                                .turnTo(Math.toRadians(35))
+                        new HorizontalSlideAction(EXTENDED),
+                        Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(60)))
+                                .turnTo(Math.toRadians(-50))
+                                .turnTo(Math.toRadians(60))
                                 .build(),
 
-                        new HorizontalSlideAction(EXTENDED3),
-                        Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(35)))
-                                .turnTo(Math.toRadians(-35))
+                        new HorizontalSlideAction(EXTENDED),
+                        Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(60)))
+                                .turnTo(Math.toRadians(-50))
                                 .turnTo(Math.toRadians(90))
                                 .build(),
 
@@ -125,7 +118,7 @@ public class FiveSpecAuton extends LinearOpMode {
                 // Collect Specimen #2
                 new ParallelAction(
                         Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(90)))
-                                .setReversed(true)
+//                                .setReversed(true)
                                 .strafeTo(new Vector2d(40,-62))
                                 .build()
                 ),
@@ -138,8 +131,8 @@ public class FiveSpecAuton extends LinearOpMode {
                         new VerticalSlideAction(RISE),
                         new OutTakeAction(OuttakeState.SCORING),
                         Drive.actionBuilder(new Pose2d(48, -62, Math.toRadians(90)))
-                                .setReversed(false)
-                                .strafeTo(new Vector2d(-3, -30))
+//                                .setReversed(false)
+                                .strafeTo(new Vector2d(-3, -24))
                                 .build()
                 ),
 
@@ -268,7 +261,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
             robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            robot.scoring.horizontalSlideExtension.setPower(Power);
+            robot.scoring.horizontalSlideExtension.setPower(1);
 
             while (opModeIsActive() && (robot.scoring.horizontalSlideExtension.isBusy())) {
             }
@@ -301,14 +294,14 @@ public class FiveSpecAuton extends LinearOpMode {
             robot.scoring.verticalSlideExtension1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.scoring.verticalSlideExtension2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            robot.scoring.verticalSlideExtension1.setPower(Power);
-            robot.scoring.verticalSlideExtension2.setPower(Power);
+            robot.scoring.verticalSlideExtension1.setPower(1);
+            robot.scoring.verticalSlideExtension2.setPower(1);
 
             while (opModeIsActive() && (robot.scoring.verticalSlideExtension1.isBusy() || robot.scoring.verticalSlideExtension2.isBusy())) {
             }
 
-            robot.scoring.verticalSlideExtension1.setPower(HOLD);
-            robot.scoring.verticalSlideExtension2.setPower(HOLD);
+            robot.scoring.verticalSlideExtension1.setPower(0.00025);
+            robot.scoring.verticalSlideExtension2.setPower(0.00025);
 
             robot.scoring.verticalSlideExtension1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.scoring.verticalSlideExtension2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

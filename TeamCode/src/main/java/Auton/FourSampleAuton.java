@@ -20,21 +20,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
-@Disabled
 @Config
-@Autonomous(name = "67PtAuton", group = "Auton")
+@Autonomous(name = "Sample", group = "Auton")
 public class FourSampleAuton extends LinearOpMode {
 
     private final Robot robot = new Robot();
-
-    private final int BASE = 0;
-    private final int RAISED = 1500;
-
-    private final int RETRACTED = 0;
-    private final int EXTENDED = 900;
-
-    private final double OPEN = 0.25;
-    private final double CLOSE = 0.75;
+    private MecanumDrive Drive;
 
     private final double Power = 1.0;
     private final double HOLD = 0.0005;
@@ -49,6 +40,15 @@ public class FourSampleAuton extends LinearOpMode {
         ACTIVE,
         INACTIVE
     }
+
+    private final int BASE = 0;
+    private final int RAISED = 1500;
+
+    private final int RETRACTED = 0;
+    private final int EXTENDED  = 900;
+
+    private final double OPEN = 0.25;
+    private final double CLOSE = 0.75;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -79,69 +79,69 @@ public class FourSampleAuton extends LinearOpMode {
                 .setReversed(false)
                 .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(45))
                 .waitSeconds(1)
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
+                .stopAndAdd(new VerticalSlideAction(RAISED))
+                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
                 .setReversed(true)
                 .strafeTo(new Vector2d(-60, -60))
                 .waitSeconds(2)
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
+                .stopAndAdd(new ClawAction(OPEN))
 
                 // Collect Sample #1
                 .setReversed(false)
                 .strafeTo(new Vector2d(-53, -53))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
+                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+                .stopAndAdd(new VerticalSlideAction(BASE))
                 .strafeToLinearHeading(new Vector2d(-48, -50), Math.toRadians(90))
                 .waitSeconds(2)
-//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
-//                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
-//                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
+                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
+                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
+                .stopAndAdd(new ClawAction(CLOSE))
 
                 // Score Sample #1
-//                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
+                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
                 .setReversed(true)
                 .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
                 .waitSeconds(2)
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
+                .stopAndAdd(new VerticalSlideAction(RAISED))
+                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
+                .stopAndAdd(new ClawAction(OPEN))
 
                 // Collect Sample #2
                 .setReversed(false)
                 .strafeTo(new Vector2d(-53, -53))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
+                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+                .stopAndAdd(new VerticalSlideAction(BASE))
                 .strafeToLinearHeading(new Vector2d(-60, -50), Math.toRadians(90))
                 .waitSeconds(2)
-//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
-//                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
-//                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
+                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
+                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
+                .stopAndAdd(new ClawAction(CLOSE))
 
                 // Score Sample #2
-//                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
+                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
                 .setReversed(true)
                 .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
                 .waitSeconds(2)
-//                .stopAndAdd(new VerticalSlideAction(RAISED))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
-//                .stopAndAdd(new ClawAction(ClawState.OPEN))
+                .stopAndAdd(new VerticalSlideAction(RAISED))
+                .stopAndAdd(new OutTakeAction(OuttakeState.COLLECTION))
+                .stopAndAdd(new ClawAction(OPEN))
 
                 // Collect Sample #3
                 .setReversed(false)
                 .strafeTo(new Vector2d(-53, -53))
-//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
-//                .stopAndAdd(new VerticalSlideAction(BASE))
+                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+                .stopAndAdd(new VerticalSlideAction(BASE))
                 .strafeToLinearHeading(new Vector2d(-60, -50), Math.toRadians(110))
                 .waitSeconds(2)
-//                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
-//                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
-//                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
-//                .stopAndAdd(new ClawAction(ClawState.CLOSE))
+                .stopAndAdd(new OutTakeAction(OuttakeState.BASE))
+                .stopAndAdd(new HorizontalSlideAction(EXTENDED))
+                .stopAndAdd(new IntakeAction(IntakeState.ACTIVE))
+                .stopAndAdd(new ClawAction(CLOSE))
 
                 // Score Sample #3
-//                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
+                .stopAndAdd(new IntakeAction(IntakeState.INACTIVE))
                 .setReversed(true)
                 .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
                 .waitSeconds(2)

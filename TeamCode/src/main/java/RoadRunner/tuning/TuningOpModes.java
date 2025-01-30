@@ -151,6 +151,7 @@ public final class TuningOpModes {
             throw new RuntimeException();
         }
 
+        // Comment Lines 155-162 To Disable Tuning OpModes
         manager.register(metaForClass(AngularRampLogger.class), new AngularRampLogger(dvf));
         manager.register(metaForClass(ForwardPushTest.class), new ForwardPushTest(dvf));
         manager.register(metaForClass(ForwardRampLogger.class), new ForwardRampLogger(dvf));
