@@ -20,22 +20,20 @@ import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
 @Config
-@Autonomous(name = "Specimen", group = "Auton")
-public class FourSpecAuton extends LinearOpMode {
+@Autonomous(name = "4 Specimen", group = "Auton")
+public class FourSpecAutonV1 extends LinearOpMode {
 
     private final Robot robot = new Robot();
     private MecanumDrive Drive;
 
-    enum OuttakeState {
-        BASE, COLLECTION, SCORING
-    }
+    enum OuttakeState { BASE, COLLECTION, SCORING}
 
     private static final int BASE = 0, RISE = 350, RAISED = 750;
     private static final double OPEN = 0.25, CLOSE = 0.75;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addLine("Initializing...");
+        telemetry.addLine("Face Forward. Middle of Center 2 Tiles. Up Against Border.");
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(90));
@@ -48,8 +46,7 @@ public class FourSpecAuton extends LinearOpMode {
         Actions.runBlocking(new ParallelAction(
                 // Robot Setup
                 new ClawAction(CLOSE),
-                new OutTakeAction(OuttakeState.SCORING),
-                new VerticalSlideAction(RAISED)
+                new OutTakeAction(OuttakeState.SCORING)
         ));
 
         waitForStart();
@@ -60,6 +57,7 @@ public class FourSpecAuton extends LinearOpMode {
                 // Drive To Bar And Score Specimen #1
                 new ParallelAction(
                         Drive.actionBuilder(initialPosition)
+//                                .setReversed(false)
                                 .strafeTo(new Vector2d(-6, -30))
                                 .build(),
                         new VerticalSlideAction(RISE)
@@ -83,13 +81,16 @@ public class FourSpecAuton extends LinearOpMode {
                 // Collect Sample #1
                 Drive.actionBuilder(new Pose2d(24, -40, Math.toRadians(90)))
                         .splineToConstantHeading(new Vector2d(48, -9), .5)
+//                        .setReversed(true)
                         .strafeTo(new Vector2d(48, -50))
                         .build(),
 
                 // Collect Sample #2
                 Drive.actionBuilder(new Pose2d(48, -50, Math.toRadians(90)))
+//                        .setReversed(false)
                         .setTangent(1.5)
                         .splineToConstantHeading(new Vector2d(56, -9), .5)
+//                        .setReversed(true)
                         .strafeTo(new Vector2d(56, -50))
                         .build(),
 
@@ -107,7 +108,8 @@ public class FourSpecAuton extends LinearOpMode {
                         new VerticalSlideAction(RISE),
                         new OutTakeAction(OuttakeState.SCORING),
                         Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
-                                .strafeTo(new Vector2d(-3, -30))
+//                                .setReversed(false)
+                                .strafeTo(new Vector2d(-2, -30))
                                 .build()
                 ),
 
@@ -119,11 +121,12 @@ public class FourSpecAuton extends LinearOpMode {
                         new VerticalSlideAction(BASE)
                 ),
 
-                CollectAndScore(0), // Specimen #3
-                CollectAndScore(3), // Specimen #4
+                CollectAndScore(2), // Specimen #3
+                CollectAndScore(6), // Specimen #4
 
                 // Park
                 Drive.actionBuilder(new Pose2d(3, -30, Math.toRadians(90)))
+//                        .setReversed(true)
                         .strafeTo(new Vector2d(60, -60))
                         .build()
 
@@ -134,7 +137,7 @@ public class FourSpecAuton extends LinearOpMode {
         return new SequentialAction(
 
                 // Move to Collection Zone
-                Drive.actionBuilder(new Pose2d(barX, -30, Math.toRadians(90)))
+                Drive.actionBuilder(new Pose2d(barX - 4, -30, Math.toRadians(90)))
                         .setReversed(true)
                         .setTangent(30)
                         .splineToConstantHeading(new Vector2d(24, -48), 0)
@@ -242,15 +245,14 @@ public class FourSpecAuton extends LinearOpMode {
                 robot.scoring.verticalSlideExtension2.setPower(1);
             }
 
-            boolean slidesAreBusy = robot.scoring.verticalSlideExtension1.isBusy() ||
-                    robot.scoring.verticalSlideExtension2.isBusy();
+            boolean slidesAreBusy = robot.scoring.verticalSlideExtension1.isBusy() || robot.scoring.verticalSlideExtension2.isBusy();
 
             telemetryPacket.put("Slide Target Position", targetPosition);
             telemetryPacket.put("Slide Busy", slidesAreBusy);
 
             if (!slidesAreBusy) {
-                robot.scoring.verticalSlideExtension1.setPower(0.0005);
-                robot.scoring.verticalSlideExtension2.setPower(0.0005);
+                robot.scoring.verticalSlideExtension1.setPower(0.000375);
+                robot.scoring.verticalSlideExtension2.setPower(0.000375);
 
                 robot.scoring.verticalSlideExtension1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 robot.scoring.verticalSlideExtension2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

@@ -13,38 +13,30 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
+@Disabled
 @Config
-@Autonomous(name = "Specimen", group = "Auton")
+@Autonomous(name = "5 Specimen", group = "Auton")
 public class FiveSpecAuton extends LinearOpMode {
 
     private final Robot robot = new Robot();
     private MecanumDrive Drive;
 
-    enum OuttakeState {
-        BASE,
-        COLLECTION,
-        SCORING
-    }
+    enum OuttakeState { BASE, COLLECTION, SCORING }
 
-    private final int BASE = 0;
-    private final int RISE = 350;
-    private final int RAISED = 750;
-
-    private final int RETRACTED = 0;
-    private final int EXTENDED = 900;
-
-    private final double OPEN = 0.25;
-    private final double CLOSE = 0.75;
+    private static final int BASE = 0, RISE = 350, RAISED = 750;
+    private static final int RETRACTED = 0, EXTENDED = 900;
+    private static final double OPEN = 0.25, CLOSE = 0.75;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addLine("Initializing...");
+        telemetry.addLine("Face Forward. Middle of Center 2 Tiles. Up Against Border.");
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(90));
@@ -102,12 +94,14 @@ public class FiveSpecAuton extends LinearOpMode {
 
                 new HorizontalSlideAction(EXTENDED),
                 Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(60)))
+                        .strafeTo(new Vector2d(40, -40))
                         .turnTo(Math.toRadians(-50))
                         .turnTo(Math.toRadians(60))
                         .build(),
 
                 new HorizontalSlideAction(EXTENDED),
                 Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(60)))
+                        .strafeTo(new Vector2d(50, -40))
                         .turnTo(Math.toRadians(-50))
                         .turnTo(Math.toRadians(90))
                         .build(),
@@ -116,7 +110,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
 
                 // Collect Specimen #2
-                Drive.actionBuilder(new Pose2d(30, -40, Math.toRadians(90)))
+                Drive.actionBuilder(new Pose2d(50, -40, Math.toRadians(90)))
 //                        .setReversed(true)
                         .strafeTo(new Vector2d(40, -62))
                         .build(),

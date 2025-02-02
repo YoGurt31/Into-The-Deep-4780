@@ -13,138 +13,200 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(80, 80, Math.toRadians(180), Math.toRadians(180), 16)
+                .setConstraints(80, 80, Math.toRadians(360), Math.toRadians(360), 16)
                 .build();
 
-        myBot.setDimensions(16,17);
+        myBot.setDimensions(16, 17);
 
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, -62, Math.toRadians(90)))
-                // SPECIMEN PATH (Sweeping) (new Pose2d(0, -62, Math.toRadians(90)))
-                // Drive To Bar And Score Specimen #1
-                .setReversed(false)
-                .strafeTo(new Vector2d(-6, -30))
-
-                // Drive To Collect Samples
-                .setReversed(true)
-                .setTangent(5)
-                .splineToLinearHeading(new Pose2d(30, -40, Math.toRadians(55)), .8)
-
-                // Collect Sample #1
-                .turnTo(Math.toRadians(-35))
-                .turnTo(Math.toRadians(45))
-
-                // Collect Sample #2
-                .turnTo(Math.toRadians(-35))
-                .turnTo(Math.toRadians(35))
-
-                // Collect Sample #3
-                .turnTo(Math.toRadians(-35))
-                .turnTo(Math.toRadians(90))
-
-                // Collect Specimen #2
-                .setReversed(true)
-                .strafeTo(new Vector2d(40, -62))
-
-                // Score Specimen #2
-                .setReversed(false)
-                .strafeTo(new Vector2d(-3, -30))
-
-                // Collect Specimen #3
-                .setReversed(true)
-                .setTangent(30)
-                .splineToConstantHeading(new Vector2d(24, -48), 0)
-                .splineToConstantHeading(new Vector2d(40, -62), 30)
-
-                // Score Specimen #3
-                .setReversed(false)
-                .strafeTo(new Vector2d(0, -30))
-
-                // Collect Specimen #4
-                .setReversed(true)
-                .setTangent(30)
-                .splineToConstantHeading(new Vector2d(24, -48), 0)
-                .splineToConstantHeading(new Vector2d(40, -62), 30)
-
-                // Score Specimen #4
-                .setReversed(false)
-                .strafeTo(new Vector2d(3, -30))
-
-                // Collect Specimen #5
-                .setReversed(true)
-                .setTangent(30)
-                .splineToConstantHeading(new Vector2d(24, -48), 0)
-                .splineToConstantHeading(new Vector2d(40, -62), 30)
-
-                // Score Specimen #5
-                .setReversed(false)
-                .strafeTo(new Vector2d(7, -30))
-
-                .build());
-
 //                // SPECIMEN PATH (Sweeping) (new Pose2d(0, -62, Math.toRadians(90)))
 //                // Drive To Bar And Score Specimen #1
+//                .setReversed(false)
 //                .strafeTo(new Vector2d(-6, -30))
 //
 //                // Drive To Collect Samples
+//                .setReversed(true)
 //                .setTangent(5)
-//                .splineToConstantHeading(new Vector2d(24, -40), .25)
+//                .splineToLinearHeading(new Pose2d(30, -40, Math.toRadians(55)), .8)
 //
 //                // Collect Sample #1
-//                .splineToConstantHeading(new Vector2d(48, -9), .5)
-//                .strafeTo(new Vector2d(48, -50))
+//                .turnTo(Math.toRadians(-35))
+//                .turnTo(Math.toRadians(45))
 //
 //                // Collect Sample #2
-//                .setTangent(1.5)
-//                .splineToConstantHeading(new Vector2d(56, -9), .5)
-//                .strafeTo(new Vector2d(56, -50))
+//                .strafeTo(new Vector2d(40, -40))
+//                .turnTo(Math.toRadians(-35))
+//                .turnTo(Math.toRadians(35))
 //
-////                // Collect Sample #3
-////                .setTangent(1.5)
-////                .splineToConstantHeading(new Vector2d(64, -9), .5)
-////                .strafeTo(new Vector2d(64, -50))
+//                // Collect Sample #3
+//                .strafeTo(new Vector2d(50, -40))
+//                .turnTo(Math.toRadians(-35))
+//                .turnTo(Math.toRadians(90))
 //
 //                // Collect Specimen #2
-//                .setTangent(3)
-//                .splineToConstantHeading(new Vector2d(40,-62),4.5)
+//                .setReversed(true)
+//                .strafeTo(new Vector2d(40, -62))
 //
 //                // Score Specimen #2
+//                .setReversed(false)
 //                .strafeTo(new Vector2d(-3, -30))
 //
 //                // Collect Specimen #3
+//                .setReversed(true)
 //                .setTangent(30)
 //                .splineToConstantHeading(new Vector2d(24, -48), 0)
 //                .splineToConstantHeading(new Vector2d(40, -62), 30)
 //
 //                // Score Specimen #3
+//                .setReversed(false)
 //                .strafeTo(new Vector2d(0, -30))
 //
 //                // Collect Specimen #4
+//                .setReversed(true)
 //                .setTangent(30)
 //                .splineToConstantHeading(new Vector2d(24, -48), 0)
 //                .splineToConstantHeading(new Vector2d(40, -62), 30)
 //
 //                // Score Specimen #4
+//                .setReversed(false)
 //                .strafeTo(new Vector2d(3, -30))
 //
-////                // Collect Specimen #5
-////                .setTangent(30)
-////                .splineToConstantHeading(new Vector2d(24, -48), 0)
-////                .splineToConstantHeading(new Vector2d(40, -62), 30)
-////
-////                // Score Specimen #5
-////                .strafeTo(new Vector2d(7, -30))
+//                // Collect Specimen #5
+//                .setReversed(true)
+//                .setTangent(30)
+//                .splineToConstantHeading(new Vector2d(24, -48), 0)
+//                .splineToConstantHeading(new Vector2d(40, -62), 30)
 //
-//                // Park
-//                .strafeTo(new Vector2d(60, -60))
+//                // Score Specimen #5
+//                .setReversed(false)
+//                .strafeTo(new Vector2d(7, -30))
 //
 //                .build());
+
+
+
+//                // SPECIMEN PATH (4 Spec V1) (new Pose2d(0, -62, Math.toRadians(270)))
+//                // Drive To Bar And Score Specimen #1
+//                .strafeTo(new Vector2d(-6, -30))
+//                .waitSeconds(0.5)
+//
+//                // Move to Sample Collection Zone
+//                .setTangent(5)
+//                .splineToLinearHeading(new Pose2d(24, -40, Math.toRadians(90)), .25)
+//
+//                // Collect Sample #1
+//                .splineToConstantHeading(new Vector2d(48, -9), .5)
+//                .strafeTo(new Vector2d(48, -50))
+//                .waitSeconds(0.5)
+//
+//                // Collect Sample #2
+//                .setTangent(1.5)
+//                .splineToConstantHeading(new Vector2d(56, -9), .5)
+//                .strafeTo(new Vector2d(56, -50))
+//                .waitSeconds(0.5)
+//
+//                // Collect Specimen #2
+//                .setTangent(3)
+//                .splineToConstantHeading(new Vector2d(40, -62), 4.5)
+//                .waitSeconds(0.5)
+//
+//                // Score Specimen #2
+//                .splineToLinearHeading(new Pose2d(-2, -36, Math.toRadians(270)), 1.5)
+//                .strafeTo(new Vector2d(-2, -30))
+//                .waitSeconds(0.5)
+//
+//                // Collect Specimen #3
+//                .strafeTo(new Vector2d(-2, -36))
+//                .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(90))
+//                .strafeTo(new Vector2d(40, -62))
+//                .waitSeconds(0.5)
+//
+//                // Score Specimen #3
+//                .splineToLinearHeading(new Pose2d(2, -36, Math.toRadians(270)), 1.5)
+//                .strafeTo(new Vector2d(2, -30))
+//                .waitSeconds(0.5)
+//
+//                // Collect Specimen #4
+//                .strafeTo(new Vector2d(2, -36))
+//                .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(90))
+//                .strafeTo(new Vector2d(40, -62))
+//                .waitSeconds(0.5)
+//
+//                // Score Specimen #4
+//                .splineToLinearHeading(new Pose2d(6, -36, Math.toRadians(270)), 1.5)
+//                .strafeTo(new Vector2d(6, -30))
+//                .waitSeconds(0.5)
+//
+//                // Park
+//                .splineToLinearHeading(new Pose2d(60, -60, Math.toRadians(90)), .1)
+//
+//                .build());
+
+
+
+                // SPECIMEN PATH (4 Spec V2) (new Pose2d(0, -62, Math.toRadians(270)))
+                // Drive To Bar And Score Specimen #1
+                .strafeTo(new Vector2d(-6, -30))
+                .waitSeconds(0.5)
+
+                // Move to Sample Collection Zone
+                .setTangent(5)
+                .splineToLinearHeading(new Pose2d(24, -40, Math.toRadians(90)), .25)
+
+                // Collect Sample #1
+                .splineToConstantHeading(new Vector2d(48, -9), .5)
+                .strafeTo(new Vector2d(48, -50))
+                .waitSeconds(0.5)
+
+                // Collect Sample #2
+                .setTangent(1.5)
+                .splineToConstantHeading(new Vector2d(56, -9), .5)
+                .strafeTo(new Vector2d(56, -50))
+                .waitSeconds(0.5)
+
+                // Collect Specimen #2
+                .setTangent(3)
+                .splineToConstantHeading(new Vector2d(40, -62), 4.5)
+                .waitSeconds(0.5)
+
+                // Score Specimen #2
+                .splineToLinearHeading(new Pose2d(-2, -36, Math.toRadians(270)), 1.5)
+                .strafeTo(new Vector2d(-2, -30))
+                .waitSeconds(0.5)
+
+                // Collect Specimen #3
+                .strafeTo(new Vector2d(-2, -36))
+                .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(90))
+                .strafeTo(new Vector2d(40, -62))
+                .waitSeconds(0.5)
+
+                // Score Specimen #3
+                .splineToLinearHeading(new Pose2d(2, -36, Math.toRadians(270)), 1.5)
+                .strafeTo(new Vector2d(2, -30))
+                .waitSeconds(0.5)
+
+                // Collect Specimen #4
+                .strafeTo(new Vector2d(2, -36))
+                .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(90))
+                .strafeTo(new Vector2d(40, -62))
+                .waitSeconds(0.5)
+
+                // Score Specimen #4
+                .splineToLinearHeading(new Pose2d(6, -36, Math.toRadians(270)), 1.5)
+                .strafeTo(new Vector2d(6, -30))
+                .waitSeconds(0.5)
+
+                // Park
+                .splineToLinearHeading(new Pose2d(60, -60, Math.toRadians(90)), .1)
+
+                .build());
 
 
 
 //                // SAMPLE PATH (4 Samples) (new Pose2d(-39, -62, Math.toRadians(90)))
 //                // Drive To Bucket And Score Sample
 //                .setReversed(false)
-//                .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(45))
+//                .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(-135))
 //                .waitSeconds(1)
 //                .setReversed(true)
 //                .strafeTo(new Vector2d(-60, -60))
@@ -157,7 +219,7 @@ public class MeepMeepTesting {
 //
 //                // Score Sample #1
 //                .setReversed(true)
-//                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
+//                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(-135))
 //                .waitSeconds(2)
 //
 //                // Collect Sample #2
@@ -167,7 +229,7 @@ public class MeepMeepTesting {
 //
 //                // Score Sample #2
 //                .setReversed(true)
-//                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
+//                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(-135))
 //                .waitSeconds(2)
 //
 //                // Collect Sample #3
@@ -177,12 +239,12 @@ public class MeepMeepTesting {
 //
 //                // Score Sample #3
 //                .setReversed(true)
-//                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(45))
+//                .strafeToLinearHeading(new Vector2d(-60, -60), Math.toRadians(-135))
 //                .waitSeconds(2)
 //
 //                // Park
 //                .setReversed(false)
-//                .splineTo(new Vector2d(-24, 0), 0)
+//                .strafeToLinearHeading(new Vector2d(-24, 0), Math.toRadians(0))
 //                .waitSeconds(2)
 //
 //                .build());
