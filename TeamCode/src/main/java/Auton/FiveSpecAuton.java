@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -20,7 +21,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
-@Disabled
 @Config
 @Autonomous(name = "5 Specimen", group = "Auton")
 public class FiveSpecAuton extends LinearOpMode {
@@ -28,10 +28,16 @@ public class FiveSpecAuton extends LinearOpMode {
     private final Robot robot = new Robot();
     private MecanumDrive Drive;
 
-    enum OuttakeState {BASE, COLLECTION, REVERSESCORING}
+    enum OuttakeState {BASE, COLLECTION, SCORING, REVERSESCORING}
 
-    private static final int RETRACTED = 0, EXTENDED = 750;
+    private static final int BASE = 0, LIFTED = 300, RAISED = 750;
+    private static final int RETRACTED = 0, EXTENDED = 550;
     private static final double OPEN = 0.25, CLOSE = 0.75;
+    private static final double UP = 0.1, DOWN = 0.80;
+
+    private double SweepBuffer = 0.25;
+    private double ClawBuffer = 0.10;
+    private double VerticalSlideBuffer = 0.75;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -40,8 +46,6 @@ public class FiveSpecAuton extends LinearOpMode {
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(270));
         Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 80%
-        MecanumDrive.PARAMS.maxWheelVel = 80;
-        MecanumDrive.PARAMS.maxProfileAccel = 80;
 
         robot.init(hardwareMap);
 
@@ -57,148 +61,185 @@ public class FiveSpecAuton extends LinearOpMode {
 
         Actions.runBlocking(new SequentialAction(
 
+                new VerticalSlideAction(RAISED),
+
                 // Drive To Bar And Score Specimen #1
                 Drive.actionBuilder(initialPosition)
-                        .strafeTo(new Vector2d(-6, -30))
+                        .setReversed(true)
+                        .strafeTo(new Vector2d(0, -30))
                         .build(),
 
                 new ParallelAction(
                         new ClawAction(OPEN),
-                        new OutTakeAction(OuttakeState.COLLECTION)
+                        new OutTakeAction(OuttakeState.COLLECTION),
+                        new VerticalSlideAction(BASE)
                 ),
 
-
                 // Move to Sample Collection Zone
-                Drive.actionBuilder(new Pose2d(-6, -30, Math.toRadians(270)))
+                Drive.actionBuilder(new Pose2d(0, -30, Math.toRadians(270)))
+                        .setReversed(false)
                         .setTangent(5)
-                        .splineToLinearHeading(new Pose2d(36, -36, Math.toRadians(55)), .8)
+                        .splineToLinearHeading(new Pose2d(32, -38, Math.toRadians(70)), .8)
                         .build(),
 
 
                 // Sweep Samples
-                new HorizontalSlideAction(EXTENDED),
-                Drive.actionBuilder(new Pose2d(36, -36, Math.toRadians(55)))
-                        .strafeToLinearHeading(new Vector2d(36, -48), Math.toRadians(-45))
+                new ParallelAction(
+                        new SweeperAction(DOWN),
+                        new HorizontalSlideAction(EXTENDED)
+                ),
+
+                // Sample 1
+                Drive.actionBuilder(new Pose2d(32, -38, Math.toRadians(70)))
+                        .waitSeconds(SweepBuffer)
+                        .strafeToLinearHeading(new Vector2d(32, -44), Math.toRadians(-65))
                         .build(),
 
-                Drive.actionBuilder(new Pose2d(36, -48, Math.toRadians(45)))
-                        .strafeToLinearHeading(new Vector2d(42, -40), Math.toRadians(45))
-                        .waitSeconds(0.2)
-                        .strafeToLinearHeading(new Vector2d(42, -48), Math.toRadians(-45))
+                new SweeperAction(UP),
+
+                Drive.actionBuilder(new Pose2d(32, -44, Math.toRadians(-65)))
+                        .strafeToLinearHeading(new Vector2d(32, -32), Math.toRadians(68))
                         .build(),
 
-                Drive.actionBuilder(new Pose2d(42, -48, Math.toRadians(45)))
-                        .strafeToLinearHeading(new Vector2d(48, -40), Math.toRadians(45))
-                        .waitSeconds(0.2)
-                        .strafeToLinearHeading(new Vector2d(48, -48), Math.toRadians(-45))
+                new SweeperAction(DOWN),
+
+                // Sample 2
+                Drive.actionBuilder(new Pose2d(32, -32, Math.toRadians(68)))
+                        .waitSeconds(SweepBuffer)
+                        .strafeToLinearHeading(new Vector2d(40, -44), Math.toRadians(-65))
                         .build(),
 
+                new SweeperAction(UP),
+
+                Drive.actionBuilder(new Pose2d(40, -44, Math.toRadians(-65)))
+                        .strafeToLinearHeading(new Vector2d(44, -32), Math.toRadians(68))
+                        .build(),
+
+                new SweeperAction(DOWN),
+
+                // Sample 3
+                Drive.actionBuilder(new Pose2d(44, -32, Math.toRadians(68)))
+                        .waitSeconds(SweepBuffer)
+                        .strafeToLinearHeading(new Vector2d(48, -44), Math.toRadians(-65))
+                        .build(),
+
+                new SweeperAction(UP),
                 new HorizontalSlideAction(RETRACTED),
 
 
+
                 // Collect Specimen #2
-                Drive.actionBuilder(new Pose2d(48, -48, Math.toRadians(90)))
-                        .setTangent(3)
-                        .splineToLinearHeading(new Pose2d(40, -58, Math.toRadians(90)), 4.5)
-                        .strafeTo(new Vector2d(40, -62))
+                Drive.actionBuilder(new Pose2d(48, -44, Math.toRadians(-65)))
+                        .strafeToLinearHeading(new Vector2d(40, -62), Math.toRadians(90))
                         .build(),
 
                 // Grab Specimen
                 new ClawAction(CLOSE),
+                new SleepAction(ClawBuffer),
 
                 // Score Specimen #2
                 new ParallelAction(
-                        new OutTakeAction(OuttakeState.REVERSESCORING),
+                        new OutTakeAction(OuttakeState.SCORING),
+                        new VerticalSlideAction(LIFTED),
                         Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
-                                .strafeTo(new Vector2d(40, -58))
-                                .strafeToLinearHeading(new Vector2d(-3, -36), Math.toRadians(270))
-                                .strafeTo(new Vector2d(-3, -30))
+                                .strafeToConstantHeading(new Vector2d(-4, -32))
                                 .build()
                 ),
 
+                new VerticalSlideAction(RAISED),
+                new SleepAction(VerticalSlideBuffer),
+
                 new ParallelAction(
                         new ClawAction(OPEN),
-                        new OutTakeAction(OuttakeState.COLLECTION)
+                        new OutTakeAction(OuttakeState.COLLECTION),
+                        new VerticalSlideAction(BASE)
                 ),
 
 
                 // Collect Specimen #3
-                Drive.actionBuilder(new Pose2d(-3, -30, Math.toRadians(270)))
-                        .strafeTo(new Vector2d(-3, -36))
-                        .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(90))
-                        .strafeTo(new Vector2d(40, -62))
+                Drive.actionBuilder(new Pose2d(-4, -30, Math.toRadians(90)))
+                        .strafeToConstantHeading(new Vector2d(40, -62))
                         .build(),
 
                 // Grab Specimen
                 new ClawAction(CLOSE),
+                new SleepAction(ClawBuffer),
 
                 // Score Specimen #3
                 new ParallelAction(
-                        new OutTakeAction(OuttakeState.REVERSESCORING),
+                        new OutTakeAction(OuttakeState.SCORING),
+                        new VerticalSlideAction(LIFTED),
                         Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
-                                .strafeTo(new Vector2d(40, -58))
-                                .strafeToLinearHeading(new Vector2d(0, -36), Math.toRadians(270))
-                                .strafeTo(new Vector2d(0, -30))
+                                .strafeToConstantHeading(new Vector2d(-2, -32))
                                 .build()
                 ),
 
+                new VerticalSlideAction(RAISED),
+                new SleepAction(VerticalSlideBuffer),
+
                 new ParallelAction(
                         new ClawAction(OPEN),
-                        new OutTakeAction(OuttakeState.COLLECTION)
+                        new OutTakeAction(OuttakeState.COLLECTION),
+                        new VerticalSlideAction(BASE)
                 ),
 
 
                 // Collect Specimen #4
-                Drive.actionBuilder(new Pose2d(0, -30, Math.toRadians(270)))
-                        .strafeTo(new Vector2d(0, -36))
-                        .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(90))
-                        .strafeTo(new Vector2d(40, -62))
+                Drive.actionBuilder(new Pose2d(-2, -30, Math.toRadians(90)))
+                        .strafeToConstantHeading(new Vector2d(40, -62))
                         .build(),
 
                 // Grab Specimen
                 new ClawAction(CLOSE),
+                new SleepAction(ClawBuffer),
 
                 // Score Specimen #4
                 new ParallelAction(
-                        new OutTakeAction(OuttakeState.REVERSESCORING),
+                        new OutTakeAction(OuttakeState.SCORING),
+                        new VerticalSlideAction(LIFTED),
                         Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
-                                .strafeTo(new Vector2d(40, -58))
-                                .strafeToLinearHeading(new Vector2d(3, -36), Math.toRadians(270))
-                                .strafeTo(new Vector2d(3, -30))
+                                .strafeToConstantHeading(new Vector2d(2, -32))
                                 .build()
                 ),
 
+                new VerticalSlideAction(RAISED),
+                new SleepAction(VerticalSlideBuffer),
+
                 new ParallelAction(
                         new ClawAction(OPEN),
-                        new OutTakeAction(OuttakeState.COLLECTION)
+                        new OutTakeAction(OuttakeState.COLLECTION),
+                        new VerticalSlideAction(BASE)
                 ),
 
 
                 // Collect Specimen #5
-                Drive.actionBuilder(new Pose2d(3, -30, Math.toRadians(270)))
-                        .strafeTo(new Vector2d(3, -36))
-                        .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(90))
-                        .strafeTo(new Vector2d(40, -62))
+                Drive.actionBuilder(new Pose2d(2, -30, Math.toRadians(90)))
+                        .strafeToConstantHeading(new Vector2d(40, -62))
                         .build(),
 
                 // Grab Specimen
                 new ClawAction(CLOSE),
+                new SleepAction(ClawBuffer),
 
                 // Score Specimen #5
                 new ParallelAction(
-                        new OutTakeAction(OuttakeState.REVERSESCORING),
+                        new OutTakeAction(OuttakeState.SCORING),
+                        new VerticalSlideAction(LIFTED),
                         Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
-                                .strafeTo(new Vector2d(40, -58))
-                                .strafeToLinearHeading(new Vector2d(6, -36), Math.toRadians(270))
-                                .strafeTo(new Vector2d(6, -30))
+                                .strafeToConstantHeading(new Vector2d(4, -32))
                                 .build()
                 ),
 
+                new VerticalSlideAction(RAISED),
+                new SleepAction(VerticalSlideBuffer),
+
                 new ParallelAction(
                         new ClawAction(OPEN),
-                        new OutTakeAction(OuttakeState.COLLECTION)
-                )
+                        new OutTakeAction(OuttakeState.COLLECTION),
+                        new VerticalSlideAction(BASE)
+                ),
 
+                new SleepAction(30)
         ));
     }
 
@@ -228,9 +269,14 @@ public class FiveSpecAuton extends LinearOpMode {
                     robot.scoring.clawPrimaryPivot.setPosition(0.05);
                     break;
 
+                case SCORING:
+                    robot.scoring.outtakeArmRotation.setPosition(0.80);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.75);
+                    break;
+
                 case REVERSESCORING: // Default
-                    robot.scoring.outtakeArmRotation.setPosition(0.50);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.05);
+                    robot.scoring.outtakeArmRotation.setPosition(0.62);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.18);
                     break;
             }
         }
@@ -255,34 +301,111 @@ public class FiveSpecAuton extends LinearOpMode {
         }
     }
 
-    public class HorizontalSlideAction implements Action {
-        private final int horizotalTargetPosition;
+    public class SweeperAction implements Action {
+        private final double targetState;
 
-        public HorizontalSlideAction(int position) {
-            this.horizotalTargetPosition = position;
+        public SweeperAction(double STATE) {
+            this.targetState = STATE;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            slidesToPosition(horizotalTargetPosition);
-            telemetryPacket.put("Slide Target Position", horizotalTargetPosition);
+            setSweeperState(targetState);
+            telemetryPacket.put("Sweeper State", targetState);
             return false;
         }
 
-        private void slidesToPosition(int position) {
-            robot.scoring.horizontalSlideExtension.setTargetPosition(position);
+        private void setSweeperState(double STATE) {
+            robot.scoring.sweeper.setPosition(STATE);
+        }
+    }
 
-            robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    public class HorizontalSlideAction implements Action {
+        private final int targetPosition;
+        private boolean isStarted = false;
 
-            robot.scoring.horizontalSlideExtension.setPower(1);
+        public HorizontalSlideAction(int position) {
+            this.targetPosition = position;
+        }
 
-            while (opModeIsActive() && (robot.scoring.horizontalSlideExtension.isBusy())) {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!isStarted) {
+                isStarted = true;
+
+                robot.scoring.horizontalSlideExtension.setTargetPosition(targetPosition);
+
+                robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                robot.scoring.horizontalSlideExtension.setPower(1);
             }
 
-            robot.scoring.horizontalSlideExtension.setPower(0);
-            robot.scoring.horizontalSlideExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            boolean slidesAreBusy = robot.scoring.horizontalSlideExtension.isBusy();
 
-            robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            telemetryPacket.put("Horizontal Slide Target Position", targetPosition);
+            telemetryPacket.put("Horizontal Slide Busy", slidesAreBusy);
+
+            if (!slidesAreBusy) {
+                robot.scoring.horizontalSlideExtension.setPower(0);
+                robot.scoring.horizontalSlideExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public class VerticalSlideAction implements Action {
+        private final int targetPosition;
+        private boolean isStarted = false;
+
+        public VerticalSlideAction(int position) {
+            this.targetPosition = position;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!isStarted) {
+                isStarted = true;
+
+                robot.scoring.verticalSlideExtension1.setTargetPosition(targetPosition);
+                robot.scoring.verticalSlideExtension2.setTargetPosition(targetPosition);
+
+                robot.scoring.verticalSlideExtension1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.scoring.verticalSlideExtension2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                robot.scoring.verticalSlideExtension1.setPower(1);
+                robot.scoring.verticalSlideExtension2.setPower(1);
+            }
+
+            boolean slidesAreBusy = robot.scoring.verticalSlideExtension1.isBusy() || robot.scoring.verticalSlideExtension2.isBusy();
+
+            telemetryPacket.put("Vertical Slide Target Position", targetPosition);
+            telemetryPacket.put("Vertical Slide Busy", slidesAreBusy);
+
+//            if (!slidesAreBusy) {
+//                robot.scoring.verticalSlideExtension1.setPower(0.000375);
+//                robot.scoring.verticalSlideExtension2.setPower(0.000375);
+//
+//                robot.scoring.verticalSlideExtension1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//                robot.scoring.verticalSlideExtension2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//                return true;
+//            }
+
+            if (!slidesAreBusy) {
+                robot.scoring.verticalSlideExtension1.setPower(0);
+                robot.scoring.verticalSlideExtension2.setPower(0);
+
+                robot.scoring.verticalSlideExtension1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                robot.scoring.verticalSlideExtension2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                return true;
+            }
+
+            return false;
         }
     }
 }

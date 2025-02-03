@@ -21,7 +21,7 @@ public class TeleOp4780 extends LinearOpMode {
 
     private final Robot robot = new Robot();
 
-    OuttakeState outtakeState = OuttakeState.COLLECTION;
+    OuttakeState outtakeState = OuttakeState.REVERSESCORING;
 
     private final double intakeLiftedPosition = 0.00;
     private final double intakeLoweredPosition = 0.30;
@@ -30,11 +30,7 @@ public class TeleOp4780 extends LinearOpMode {
     boolean lastBButtonState = false;
     boolean lastXButtonState = false;
 
-    enum OuttakeState {
-        BASE,
-        COLLECTION,
-        SCORING
-    }
+    enum OuttakeState { BASE, COLLECTION, SCORING, REVERSESCORING }
 
     RevBlinkinLedDriver.BlinkinPattern currentPattern;
     RevBlinkinLedDriver.BlinkinPattern targetPattern;
@@ -336,9 +332,15 @@ public class TeleOp4780 extends LinearOpMode {
 
                     break;
 
-                case SCORING: // Default
+                case SCORING:
                     robot.scoring.outtakeArmRotation.setPosition(0.80);
                     robot.scoring.clawPrimaryPivot.setPosition(0.75);
+
+                    break;
+
+                case REVERSESCORING:
+                    robot.scoring.outtakeArmRotation.setPosition(0.62);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.18);
 
                     break;
             }

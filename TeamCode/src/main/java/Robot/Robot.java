@@ -91,7 +91,7 @@ public class Robot {
     // Scoring Subsystem
     public class Scoring {
         public DcMotor horizontalSlideExtension, verticalSlideExtension1, verticalSlideExtension2, rollerInOut;
-        public Servo intakePivot, outtakeArmRotation, clawPrimaryPivot, clawStatus;
+        public Servo sweeper, intakePivot, outtakeArmRotation, clawPrimaryPivot, clawStatus;
         public RevBlinkinLedDriver blinkinLedDriver;
         public ColorSensor colorSensor;
 
@@ -115,6 +115,8 @@ public class Robot {
             rollerInOut.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rollerInOut.setDirection(DcMotorSimple.Direction.FORWARD);
             rollerInOut.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            sweeper = hwMap.servo.get("sweeper");                        // Config 1 (Control)
 
             intakePivot = hwMap.servo.get("intakePivot");                // Config 2 (Control)
 
