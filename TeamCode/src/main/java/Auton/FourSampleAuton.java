@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -20,7 +21,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
-@Disabled
 @Config
 @Autonomous(name = "Sample", group = "Auton")
 public class FourSampleAuton extends LinearOpMode {
@@ -28,9 +28,9 @@ public class FourSampleAuton extends LinearOpMode {
     private final Robot robot = new Robot();
     private MecanumDrive Drive;
 
-    enum OuttakeState { BASE, COLLECTION, SCORING }
+    enum OuttakeState {BASE, COLLECTION, SCORING}
 
-    enum IntakeState { ACTIVE, INACTIVE }
+    enum IntakeState {ACTIVE, INACTIVE}
 
     private static final int BASE = 0, RAISED = 1500;
     private static final int RETRACTED = 0, EXTENDED = 900;
@@ -42,17 +42,14 @@ public class FourSampleAuton extends LinearOpMode {
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(-39, -62, Math.toRadians(90));
-        MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 50%
-        MecanumDrive.PARAMS.maxWheelVel = 50;
-        MecanumDrive.PARAMS.maxProfileAccel = 50;
+        MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 80%
 
         robot.init(hardwareMap);
 
         Actions.runBlocking(new ParallelAction(
                         // Robot Setup
                         new ClawAction(CLOSE),
-                        new OutTakeAction(OuttakeState.SCORING),
-                        new VerticalSlideAction(RAISED)
+                        new OutTakeAction(OuttakeState.SCORING)
                 )
         );
 
@@ -62,11 +59,9 @@ public class FourSampleAuton extends LinearOpMode {
 
         Actions.runBlocking(new SequentialAction(
 
-                new ParallelAction(
-                        Drive.actionBuilder(initialPosition)
-                                .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(-135))
-                                .build()
-                ),
+                Drive.actionBuilder(initialPosition)
+                        .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(-135))
+                        .build(),
 
                 new ParallelAction(
                         new VerticalSlideAction(RAISED),
@@ -82,14 +77,17 @@ public class FourSampleAuton extends LinearOpMode {
                         new VerticalSlideAction(BASE)
                 ),
 
-                CollectAndScore(-48, Math.toRadians(0)), // Sample 1
-                CollectAndScore(-60, Math.toRadians(0)), // Sample 2
-                CollectAndScore(-60, Math.toRadians(110)), // Sample 3
+//                CollectAndScore(-48, Math.toRadians(0)), // Sample 1
+//                CollectAndScore(-60, Math.toRadians(0)), // Sample 2
+//                CollectAndScore(-60, Math.toRadians(110)), // Sample 3
+//
+//                // **Park**
+//                Drive.actionBuilder(new Pose2d(-60, -60, Math.toRadians(45)))
+//                        .strafeToLinearHeading(new Vector2d(-24, 0), Math.toRadians(0))
+//                        .build()
 
-                // **Park**
-                Drive.actionBuilder(new Pose2d(-60, -60, Math.toRadians(45)))
-                        .strafeToLinearHeading(new Vector2d(-24, 0), Math.toRadians(0))
-                        .build()
+
+                new SleepAction(30)
         ));
     }
 

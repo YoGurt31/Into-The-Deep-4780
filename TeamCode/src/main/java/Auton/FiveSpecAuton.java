@@ -30,14 +30,15 @@ public class FiveSpecAuton extends LinearOpMode {
 
     enum OuttakeState {BASE, COLLECTION, SCORING, REVERSESCORING}
 
-    private static final int BASE = 0, LIFTED = 300, RAISED = 750;
+    private static final int BASE = 0, RS = 333, LIFTED = 200, RAISED = 500;
     private static final int RETRACTED = 0, EXTENDED = 550;
     private static final double OPEN = 0.25, CLOSE = 0.75;
     private static final double UP = 0.1, DOWN = 0.80;
+    private static final double STATIONARY = 0.1;
 
     private double SweepBuffer = 0.25;
-    private double ClawBuffer = 0.10;
-    private double VerticalSlideBuffer = 0.75;
+    private double ClawBuffer = 0.20;
+    private double VerticalSlideBuffer = 0.55;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -45,12 +46,13 @@ public class FiveSpecAuton extends LinearOpMode {
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(270));
-        Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 80%
+        Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 90%
 
         robot.init(hardwareMap);
 
         Actions.runBlocking(new ParallelAction(
                 // Robot Setup
+                new IntakeAction(STATIONARY),
                 new ClawAction(CLOSE),
                 new OutTakeAction(OuttakeState.REVERSESCORING)
         ));
@@ -61,7 +63,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
         Actions.runBlocking(new SequentialAction(
 
-                new VerticalSlideAction(RAISED),
+                new VerticalSlideAction(RS),
 
                 // Drive To Bar And Score Specimen #1
                 Drive.actionBuilder(initialPosition)
@@ -70,9 +72,9 @@ public class FiveSpecAuton extends LinearOpMode {
                         .build(),
 
                 new ParallelAction(
+                        new VerticalSlideAction(BASE),
                         new ClawAction(OPEN),
-                        new OutTakeAction(OuttakeState.COLLECTION),
-                        new VerticalSlideAction(BASE)
+                        new OutTakeAction(OuttakeState.COLLECTION)
                 ),
 
                 // Move to Sample Collection Zone
@@ -127,10 +129,9 @@ public class FiveSpecAuton extends LinearOpMode {
                 new HorizontalSlideAction(RETRACTED),
 
 
-
                 // Collect Specimen #2
                 Drive.actionBuilder(new Pose2d(48, -44, Math.toRadians(-65)))
-                        .strafeToLinearHeading(new Vector2d(40, -62), Math.toRadians(90))
+                        .strafeToLinearHeading(new Vector2d(40, -65), Math.toRadians(90))
                         .build(),
 
                 // Grab Specimen
@@ -141,7 +142,7 @@ public class FiveSpecAuton extends LinearOpMode {
                 new ParallelAction(
                         new OutTakeAction(OuttakeState.SCORING),
                         new VerticalSlideAction(LIFTED),
-                        Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
+                        Drive.actionBuilder(new Pose2d(40, -65, Math.toRadians(90)))
                                 .strafeToConstantHeading(new Vector2d(-4, -32))
                                 .build()
                 ),
@@ -158,7 +159,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
                 // Collect Specimen #3
                 Drive.actionBuilder(new Pose2d(-4, -30, Math.toRadians(90)))
-                        .strafeToConstantHeading(new Vector2d(40, -62))
+                        .strafeToConstantHeading(new Vector2d(40, -65))
                         .build(),
 
                 // Grab Specimen
@@ -169,7 +170,7 @@ public class FiveSpecAuton extends LinearOpMode {
                 new ParallelAction(
                         new OutTakeAction(OuttakeState.SCORING),
                         new VerticalSlideAction(LIFTED),
-                        Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
+                        Drive.actionBuilder(new Pose2d(40, -65, Math.toRadians(90)))
                                 .strafeToConstantHeading(new Vector2d(-2, -32))
                                 .build()
                 ),
@@ -186,7 +187,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
                 // Collect Specimen #4
                 Drive.actionBuilder(new Pose2d(-2, -30, Math.toRadians(90)))
-                        .strafeToConstantHeading(new Vector2d(40, -62))
+                        .strafeToConstantHeading(new Vector2d(40, -65))
                         .build(),
 
                 // Grab Specimen
@@ -197,7 +198,7 @@ public class FiveSpecAuton extends LinearOpMode {
                 new ParallelAction(
                         new OutTakeAction(OuttakeState.SCORING),
                         new VerticalSlideAction(LIFTED),
-                        Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
+                        Drive.actionBuilder(new Pose2d(40, -65, Math.toRadians(90)))
                                 .strafeToConstantHeading(new Vector2d(2, -32))
                                 .build()
                 ),
@@ -275,8 +276,8 @@ public class FiveSpecAuton extends LinearOpMode {
                     break;
 
                 case REVERSESCORING: // Default
-                    robot.scoring.outtakeArmRotation.setPosition(0.62);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.18);
+                    robot.scoring.outtakeArmRotation.setPosition(0.50);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.25);
                     break;
             }
         }
@@ -406,6 +407,25 @@ public class FiveSpecAuton extends LinearOpMode {
             }
 
             return false;
+        }
+    }
+
+    public class IntakeAction implements Action {
+        private final double targetState;
+
+        public IntakeAction(double STATE) {
+            this.targetState = STATE;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            setIntakeState(targetState);
+            telemetryPacket.put("Intake State", targetState);
+            return false;
+        }
+
+        private void setIntakeState(double STATE) {
+            robot.scoring.intakePivot.setPosition(STATE);
         }
     }
 }
