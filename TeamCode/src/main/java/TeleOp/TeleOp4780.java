@@ -21,7 +21,7 @@ public class TeleOp4780 extends LinearOpMode {
 
     private final Robot robot = new Robot();
 
-    OuttakeState outtakeState = OuttakeState.SCORING;
+    OuttakeState outtakeState = OuttakeState.COLLECTION;
 
     private final double intakeLiftedPosition = 0.10;
     private final double intakeLoweredPosition = 0.30;
@@ -54,7 +54,7 @@ public class TeleOp4780 extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            robot.scoring.sweeper.setPosition(0.1);
+            robot.scoring.sweeper.setPosition(0.0);
 
             robot.driveTrain.runWithoutDriveTrainEncoders();
             robot.scoring.runScoringEncoders();
@@ -278,7 +278,7 @@ public class TeleOp4780 extends LinearOpMode {
             boolean currentXButtonState = gamepad1.x;
             if (currentXButtonState && !lastXButtonState) {
                 if (robot.scoring.clawStatus.getPosition() == 0.75) {
-                    robot.scoring.clawStatus.setPosition(0.30); // Open
+                    robot.scoring.clawStatus.setPosition(0.25); // Open
                 } else {
                     robot.scoring.clawStatus.setPosition(0.75); // Close
                 }
@@ -323,20 +323,20 @@ public class TeleOp4780 extends LinearOpMode {
 
             switch (outtakeState) {
                 case BASE:
-                    robot.scoring.outtakeArmRotation.setPosition(0.0);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.0);
-
-                    break;
-
-                case COLLECTION:
-                    robot.scoring.outtakeArmRotation.setPosition(0.38);
+                    robot.scoring.outtakeArmRotation.setPosition(0.00);
                     robot.scoring.clawPrimaryPivot.setPosition(0.05);
 
                     break;
 
+                case COLLECTION:
+                    robot.scoring.outtakeArmRotation.setPosition(0.06);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.45);
+
+                    break;
+
                 case SCORING:
-                    robot.scoring.outtakeArmRotation.setPosition(0.80);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.75);
+                    robot.scoring.outtakeArmRotation.setPosition(0.75);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.88);
 
                     break;
             }
@@ -347,7 +347,7 @@ public class TeleOp4780 extends LinearOpMode {
             telemetry.addData("Primary Pivot Position", "%.2f", robot.scoring.clawPrimaryPivot.getPosition());
 
             double clawPosition = robot.scoring.clawStatus.getPosition();
-            String clawStatus = clawPosition == 0.30 ? "Open" : "Closed";
+            String clawStatus = clawPosition == 0.25 ? "Open" : "Closed";
             telemetry.addData("Claw Status", clawStatus);
             telemetry.addData("Claw Position", "%.2f", clawPosition);
 

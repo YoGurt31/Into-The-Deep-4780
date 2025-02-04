@@ -22,17 +22,17 @@ import RoadRunner.MecanumDrive;
 import Robot.Robot;
 
 @Config
-@Autonomous(name = "Sample", group = "Auton")
+@Autonomous(name = "4 Sample", group = "Auton")
 public class FourSampleAuton extends LinearOpMode {
 
     private final Robot robot = new Robot();
     private MecanumDrive Drive;
 
-    enum OuttakeState {BASE, COLLECTION, SCORING}
+    enum OuttakeState {BASE, COLLECTION, SCORING, REVERSESCORING}
 
     enum IntakeState {ACTIVE, INACTIVE}
 
-    private static final int BASE = 0, RAISED = 1500;
+    private static final int BASE = 0, RAISED = 1300;
     private static final int RETRACTED = 0, EXTENDED = 900;
     private static final double OPEN = 0.25, CLOSE = 0.75;
 
@@ -41,13 +41,12 @@ public class FourSampleAuton extends LinearOpMode {
         telemetry.addLine("Face Forward. Left Line of Tile 2 from Bucket. Up Against Border.");
         telemetry.update();
 
-        Pose2d initialPosition = new Pose2d(-39, -62, Math.toRadians(90));
+        Pose2d initialPosition = new Pose2d(-40, -62, Math.toRadians(90));
         MecanumDrive Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 80%
 
         robot.init(hardwareMap);
 
         Actions.runBlocking(new ParallelAction(
-                        // Robot Setup
                         new ClawAction(CLOSE),
                         new OutTakeAction(OuttakeState.SCORING)
                 )
@@ -60,28 +59,79 @@ public class FourSampleAuton extends LinearOpMode {
         Actions.runBlocking(new SequentialAction(
 
                 Drive.actionBuilder(initialPosition)
-                        .strafeToLinearHeading(new Vector2d(-53, -53), Math.toRadians(-135))
+                        .strafeToLinearHeading(new Vector2d(-58, -58), Math.toRadians(45))
                         .build(),
 
-                new ParallelAction(
-                        new VerticalSlideAction(RAISED),
-                        Drive.actionBuilder(new Pose2d(-53, -53, Math.toRadians(-135)))
-                                .strafeTo(new Vector2d(-60, -60))
-                                .build()
-                ),
+                new VerticalSlideAction(RAISED),
+
+                new SleepAction(1),
+
+                new OutTakeAction(OuttakeState.REVERSESCORING),
+
+                new SleepAction(1),
 
                 new ClawAction(OPEN),
+
+                new SleepAction(1),
+
+                new ParallelAction(
+                        new OutTakeAction(OuttakeState.SCORING),
+                        Drive.actionBuilder(new Pose2d(-58, -58, Math.toRadians(45)))
+                                .strafeToLinearHeading(new Vector2d(-48, -48), Math.toRadians(90))
+                                .build()
+                ),
 
                 new ParallelAction(
                         new OutTakeAction(OuttakeState.BASE),
                         new VerticalSlideAction(BASE)
                 ),
 
-//                CollectAndScore(-48, Math.toRadians(0)), // Sample 1
-//                CollectAndScore(-60, Math.toRadians(0)), // Sample 2
-//                CollectAndScore(-60, Math.toRadians(110)), // Sample 3
-//
-//                // **Park**
+
+                // Sample 1
+                new ParallelAction(
+                        new HorizontalSlideAction(EXTENDED)
+                ),
+
+                new ParallelAction(
+                        new IntakeAction(),
+                        new HorizontalSlideAction(RETRACTED)
+                ),
+
+                new SleepAction(5),
+
+                new ClawAction(CLOSE),
+
+                new SleepAction(1),
+
+                Drive.actionBuilder(new Pose2d(-48, -48, Math.toRadians(90)))
+                        .strafeToLinearHeading(new Vector2d(-58, -58), Math.toRadians(45))
+                        .build(),
+
+                new VerticalSlideAction(RAISED),
+
+                new SleepAction(1),
+
+                new OutTakeAction(OuttakeState.REVERSESCORING),
+
+                new SleepAction(1),
+
+                new ClawAction(OPEN),
+
+                new SleepAction(1),
+
+                new ParallelAction(
+                        new OutTakeAction(OuttakeState.SCORING),
+                        Drive.actionBuilder(new Pose2d(-58, -58, Math.toRadians(45)))
+                                .strafeToLinearHeading(new Vector2d(-48, -48), Math.toRadians(90))
+                                .build()
+                ),
+
+                new ParallelAction(
+                        new OutTakeAction(OuttakeState.BASE),
+                        new VerticalSlideAction(BASE)
+                ),
+
+//                // Park
 //                Drive.actionBuilder(new Pose2d(-60, -60, Math.toRadians(45)))
 //                        .strafeToLinearHeading(new Vector2d(-24, 0), Math.toRadians(0))
 //                        .build()
@@ -89,48 +139,6 @@ public class FourSampleAuton extends LinearOpMode {
 
                 new SleepAction(30)
         ));
-    }
-
-    private Action CollectAndScore(double sampleX, double sampleHeading) {
-        return new SequentialAction(
-
-                new ParallelAction(
-                        Drive.actionBuilder(new Pose2d(-60, -60, Math.toRadians(-135)))
-                                .turnTo(sampleHeading)
-                                .strafeTo(new Vector2d(sampleX, -50))
-                                .build()
-                ),
-
-                new ParallelAction(
-                        new HorizontalSlideAction(EXTENDED),
-                        new IntakeAction(IntakeState.ACTIVE)
-                ),
-
-                new WaitForSampleIntake(),
-
-                new ParallelAction(
-                        new HorizontalSlideAction(RETRACTED),
-                        new ClawAction(CLOSE)
-                ),
-
-                new SequentialAction(
-                        Drive.actionBuilder(new Pose2d(sampleX, -50, sampleHeading))
-                                .strafeTo(new Vector2d(-60, -60))
-                                .build(),
-
-                        new ParallelAction(
-                                new VerticalSlideAction(RAISED),
-                                new OutTakeAction(OuttakeState.COLLECTION)
-                        ),
-
-                        new ClawAction(OPEN),
-
-                        new ParallelAction(
-                                new OutTakeAction(OuttakeState.BASE),
-                                new VerticalSlideAction(BASE)
-                        )
-                )
-        );
     }
 
     public class OutTakeAction implements Action {
@@ -150,18 +158,26 @@ public class FourSampleAuton extends LinearOpMode {
         private void setOuttakeState(OuttakeState state) {
             switch (state) {
                 case BASE:
-                    robot.scoring.outtakeArmRotation.setPosition(0.0);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.0);
-                    break;
-
-                case COLLECTION:
-                    robot.scoring.outtakeArmRotation.setPosition(0.38);
+                    robot.scoring.outtakeArmRotation.setPosition(0.00);
                     robot.scoring.clawPrimaryPivot.setPosition(0.05);
                     break;
 
-                case SCORING: // Default
-                    robot.scoring.outtakeArmRotation.setPosition(0.80);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.75);
+                case COLLECTION:
+                    robot.scoring.outtakeArmRotation.setPosition(0.06);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.45);
+
+                    break;
+
+                case SCORING:
+                    robot.scoring.outtakeArmRotation.setPosition(0.75);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.88);
+
+                    break;
+
+                case REVERSESCORING: // Default
+                    robot.scoring.outtakeArmRotation.setPosition(0.30);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.45);
+
                     break;
             }
         }
@@ -186,28 +202,21 @@ public class FourSampleAuton extends LinearOpMode {
         }
     }
 
-    public class WaitForSampleIntake implements Action {
+    public class IntakeAction implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             int R = robot.scoring.colorSensor.red();
             int G = robot.scoring.colorSensor.green();
             int B = robot.scoring.colorSensor.blue();
             boolean sampleDetected = (R > 2500 && G > 3000 && B < 2500) || (R > 1500 && G < 3000 && B < 2000) || (R < 2000 && G < 3000 && B > 1500);
-            telemetryPacket.put("Sample Detected", sampleDetected);
-            return sampleDetected;
-        }
-    }
 
-    public class IntakeAction implements Action {
-        private final IntakeState targetState;
-
-        public IntakeAction(IntakeState state) {
-            this.targetState = state;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            robot.scoring.rollerInOut.setPower(targetState == IntakeState.ACTIVE ? 1 : 0);
+            if (!sampleDetected) {
+                robot.scoring.rollerInOut.setPower(1);
+                robot.scoring.intakePivot.setPosition(0.3);
+            } else {
+                robot.scoring.rollerInOut.setPower(0);
+                robot.scoring.intakePivot.setPosition(0.1);
+            }
             return false;
         }
     }

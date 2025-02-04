@@ -120,11 +120,11 @@ public class Robot {
 
             intakePivot = hwMap.servo.get("intakePivot");                // Config 2 (Control)
 
-            outtakeArmRotation = hwMap.servo.get("outtakeArmRotation");  // Config 1 (Expansion)
+            outtakeArmRotation = hwMap.servo.get("outtakeArmRotation");  // Config 0 (Expansion)
 
-            clawPrimaryPivot = hwMap.servo.get("clawPrimaryPivot");      // Config 3 (Expansion)
+            clawPrimaryPivot = hwMap.servo.get("clawPrimaryPivot");      // Config 2 (Expansion)
 
-            clawStatus = hwMap.servo.get("clawStatus");                  // Config 5 (Expansion)
+            clawStatus = hwMap.servo.get("clawStatus");                  // Config 4 (Expansion)
 
             blinkinLedDriver = hwMap.get(RevBlinkinLedDriver.class, "LED");  // Config 0 (Control)
             blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_COLOR_WAVES);

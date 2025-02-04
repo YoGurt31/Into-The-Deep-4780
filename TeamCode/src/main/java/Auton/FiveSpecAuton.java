@@ -14,7 +14,6 @@ import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -30,15 +29,15 @@ public class FiveSpecAuton extends LinearOpMode {
 
     enum OuttakeState {BASE, COLLECTION, SCORING, REVERSESCORING}
 
-    private static final int BASE = 0, RS = 333, LIFTED = 200, RAISED = 500;
-    private static final int RETRACTED = 0, EXTENDED = 550;
+    private static final int BASE = 0, LIFTED = 320, RAISED = 700;
+    private static final int RETRACTED = -50, EXTENDED1 = 500, EXTENDED2 = 400, EXTENDED3 = 300;
     private static final double OPEN = 0.25, CLOSE = 0.75;
-    private static final double UP = 0.1, DOWN = 0.80;
+    private static final double UP = 0, DOWN = 0.82;
     private static final double STATIONARY = 0.1;
 
-    private double SweepBuffer = 0.25;
-    private double ClawBuffer = 0.20;
-    private double VerticalSlideBuffer = 0.55;
+    private double SweepBuffer = 0.250;
+    private double ClawBuffer = 0.150;
+    private double VerticalSlideBuffer = 0.535;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -46,7 +45,7 @@ public class FiveSpecAuton extends LinearOpMode {
         telemetry.update();
 
         Pose2d initialPosition = new Pose2d(0, -62, Math.toRadians(270));
-        Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 90%
+        Drive = new MecanumDrive(hardwareMap, initialPosition); // Run At 100%
 
         robot.init(hardwareMap);
 
@@ -63,36 +62,41 @@ public class FiveSpecAuton extends LinearOpMode {
 
         Actions.runBlocking(new SequentialAction(
 
-                new VerticalSlideAction(RS),
+                new ParallelAction(
+                        new IntakeAction(STATIONARY),
+                        new OutTakeAction(OuttakeState.REVERSESCORING),
+                        new VerticalSlideAction(LIFTED),
+                        Drive.actionBuilder(initialPosition)
+                                .setReversed(true)
+                                .strafeToConstantHeading(new Vector2d(0, -30))
+                                .build()
+                ),
 
-                // Drive To Bar And Score Specimen #1
-                Drive.actionBuilder(initialPosition)
-                        .setReversed(true)
-                        .strafeTo(new Vector2d(0, -30))
-                        .build(),
+                new VerticalSlideAction(RAISED),
+                new SleepAction(VerticalSlideBuffer),
+                new ClawAction(OPEN),
 
                 new ParallelAction(
-                        new VerticalSlideAction(BASE),
-                        new ClawAction(OPEN),
-                        new OutTakeAction(OuttakeState.COLLECTION)
+                        new OutTakeAction(OuttakeState.COLLECTION),
+                        new VerticalSlideAction(BASE)
                 ),
 
                 // Move to Sample Collection Zone
                 Drive.actionBuilder(new Pose2d(0, -30, Math.toRadians(270)))
                         .setReversed(false)
                         .setTangent(5)
-                        .splineToLinearHeading(new Pose2d(32, -38, Math.toRadians(70)), .8)
+                        .splineToLinearHeading(new Pose2d(32, -42, Math.toRadians(70)), .8)
                         .build(),
 
 
                 // Sweep Samples
                 new ParallelAction(
                         new SweeperAction(DOWN),
-                        new HorizontalSlideAction(EXTENDED)
+                        new HorizontalSlideAction(EXTENDED1)
                 ),
 
                 // Sample 1
-                Drive.actionBuilder(new Pose2d(32, -38, Math.toRadians(70)))
+                Drive.actionBuilder(new Pose2d(32, -42, Math.toRadians(72)))
                         .waitSeconds(SweepBuffer)
                         .strafeToLinearHeading(new Vector2d(32, -44), Math.toRadians(-65))
                         .build(),
@@ -100,13 +104,16 @@ public class FiveSpecAuton extends LinearOpMode {
                 new SweeperAction(UP),
 
                 Drive.actionBuilder(new Pose2d(32, -44, Math.toRadians(-65)))
-                        .strafeToLinearHeading(new Vector2d(32, -32), Math.toRadians(68))
+                        .strafeToLinearHeading(new Vector2d(32, -32), Math.toRadians(70))
                         .build(),
 
-                new SweeperAction(DOWN),
+                new ParallelAction(
+                        new SweeperAction(DOWN),
+                        new HorizontalSlideAction(EXTENDED2)
+                ),
 
                 // Sample 2
-                Drive.actionBuilder(new Pose2d(32, -32, Math.toRadians(68)))
+                Drive.actionBuilder(new Pose2d(32, -32, Math.toRadians(70)))
                         .waitSeconds(SweepBuffer)
                         .strafeToLinearHeading(new Vector2d(40, -44), Math.toRadians(-65))
                         .build(),
@@ -114,13 +121,16 @@ public class FiveSpecAuton extends LinearOpMode {
                 new SweeperAction(UP),
 
                 Drive.actionBuilder(new Pose2d(40, -44, Math.toRadians(-65)))
-                        .strafeToLinearHeading(new Vector2d(44, -32), Math.toRadians(68))
+                        .strafeToLinearHeading(new Vector2d(44, -32), Math.toRadians(70))
                         .build(),
 
-                new SweeperAction(DOWN),
+                new ParallelAction(
+                        new SweeperAction(DOWN),
+                        new HorizontalSlideAction(EXTENDED3)
+                ),
 
                 // Sample 3
-                Drive.actionBuilder(new Pose2d(44, -32, Math.toRadians(68)))
+                Drive.actionBuilder(new Pose2d(44, -32, Math.toRadians(70)))
                         .waitSeconds(SweepBuffer)
                         .strafeToLinearHeading(new Vector2d(48, -44), Math.toRadians(-65))
                         .build(),
@@ -131,7 +141,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
                 // Collect Specimen #2
                 Drive.actionBuilder(new Pose2d(48, -44, Math.toRadians(-65)))
-                        .strafeToLinearHeading(new Vector2d(40, -65), Math.toRadians(90))
+                        .strafeToLinearHeading(new Vector2d(40, -68), Math.toRadians(90))
                         .build(),
 
                 // Grab Specimen
@@ -149,9 +159,9 @@ public class FiveSpecAuton extends LinearOpMode {
 
                 new VerticalSlideAction(RAISED),
                 new SleepAction(VerticalSlideBuffer),
+                new ClawAction(OPEN),
 
                 new ParallelAction(
-                        new ClawAction(OPEN),
                         new OutTakeAction(OuttakeState.COLLECTION),
                         new VerticalSlideAction(BASE)
                 ),
@@ -159,7 +169,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
                 // Collect Specimen #3
                 Drive.actionBuilder(new Pose2d(-4, -30, Math.toRadians(90)))
-                        .strafeToConstantHeading(new Vector2d(40, -65))
+                        .strafeToConstantHeading(new Vector2d(40, -68))
                         .build(),
 
                 // Grab Specimen
@@ -170,16 +180,16 @@ public class FiveSpecAuton extends LinearOpMode {
                 new ParallelAction(
                         new OutTakeAction(OuttakeState.SCORING),
                         new VerticalSlideAction(LIFTED),
-                        Drive.actionBuilder(new Pose2d(40, -65, Math.toRadians(90)))
+                        Drive.actionBuilder(new Pose2d(40, -68, Math.toRadians(90)))
                                 .strafeToConstantHeading(new Vector2d(-2, -32))
                                 .build()
                 ),
 
                 new VerticalSlideAction(RAISED),
                 new SleepAction(VerticalSlideBuffer),
+                new ClawAction(OPEN),
 
                 new ParallelAction(
-                        new ClawAction(OPEN),
                         new OutTakeAction(OuttakeState.COLLECTION),
                         new VerticalSlideAction(BASE)
                 ),
@@ -187,7 +197,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
                 // Collect Specimen #4
                 Drive.actionBuilder(new Pose2d(-2, -30, Math.toRadians(90)))
-                        .strafeToConstantHeading(new Vector2d(40, -65))
+                        .strafeToConstantHeading(new Vector2d(40, -68))
                         .build(),
 
                 // Grab Specimen
@@ -198,16 +208,16 @@ public class FiveSpecAuton extends LinearOpMode {
                 new ParallelAction(
                         new OutTakeAction(OuttakeState.SCORING),
                         new VerticalSlideAction(LIFTED),
-                        Drive.actionBuilder(new Pose2d(40, -65, Math.toRadians(90)))
+                        Drive.actionBuilder(new Pose2d(40, -68, Math.toRadians(90)))
                                 .strafeToConstantHeading(new Vector2d(2, -32))
                                 .build()
                 ),
 
                 new VerticalSlideAction(RAISED),
                 new SleepAction(VerticalSlideBuffer),
+                new ClawAction(OPEN),
 
                 new ParallelAction(
-                        new ClawAction(OPEN),
                         new OutTakeAction(OuttakeState.COLLECTION),
                         new VerticalSlideAction(BASE)
                 ),
@@ -215,7 +225,7 @@ public class FiveSpecAuton extends LinearOpMode {
 
                 // Collect Specimen #5
                 Drive.actionBuilder(new Pose2d(2, -30, Math.toRadians(90)))
-                        .strafeToConstantHeading(new Vector2d(40, -62))
+                        .strafeToConstantHeading(new Vector2d(40, -68))
                         .build(),
 
                 // Grab Specimen
@@ -226,16 +236,16 @@ public class FiveSpecAuton extends LinearOpMode {
                 new ParallelAction(
                         new OutTakeAction(OuttakeState.SCORING),
                         new VerticalSlideAction(LIFTED),
-                        Drive.actionBuilder(new Pose2d(40, -62, Math.toRadians(90)))
+                        Drive.actionBuilder(new Pose2d(40, -68, Math.toRadians(90)))
                                 .strafeToConstantHeading(new Vector2d(4, -32))
                                 .build()
                 ),
 
                 new VerticalSlideAction(RAISED),
                 new SleepAction(VerticalSlideBuffer),
+                new ClawAction(OPEN),
 
                 new ParallelAction(
-                        new ClawAction(OPEN),
                         new OutTakeAction(OuttakeState.COLLECTION),
                         new VerticalSlideAction(BASE)
                 ),
@@ -261,23 +271,26 @@ public class FiveSpecAuton extends LinearOpMode {
         private void setOuttakeState(OuttakeState state) {
             switch (state) {
                 case BASE:
-                    robot.scoring.outtakeArmRotation.setPosition(0.0);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.0);
-                    break;
-
-                case COLLECTION:
-                    robot.scoring.outtakeArmRotation.setPosition(0.38);
+                    robot.scoring.outtakeArmRotation.setPosition(0.00);
                     robot.scoring.clawPrimaryPivot.setPosition(0.05);
                     break;
 
+                case COLLECTION:
+                    robot.scoring.outtakeArmRotation.setPosition(0.06);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.45);
+
+                    break;
+
                 case SCORING:
-                    robot.scoring.outtakeArmRotation.setPosition(0.80);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.75);
+                    robot.scoring.outtakeArmRotation.setPosition(0.75);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.88);
+
                     break;
 
                 case REVERSESCORING: // Default
-                    robot.scoring.outtakeArmRotation.setPosition(0.50);
-                    robot.scoring.clawPrimaryPivot.setPosition(0.25);
+                    robot.scoring.outtakeArmRotation.setPosition(0.30);
+                    robot.scoring.clawPrimaryPivot.setPosition(0.45);
+
                     break;
             }
         }
@@ -386,23 +399,12 @@ public class FiveSpecAuton extends LinearOpMode {
             telemetryPacket.put("Vertical Slide Target Position", targetPosition);
             telemetryPacket.put("Vertical Slide Busy", slidesAreBusy);
 
-//            if (!slidesAreBusy) {
-//                robot.scoring.verticalSlideExtension1.setPower(0.000375);
-//                robot.scoring.verticalSlideExtension2.setPower(0.000375);
-//
-//                robot.scoring.verticalSlideExtension1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//                robot.scoring.verticalSlideExtension2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//                return true;
-//            }
-
             if (!slidesAreBusy) {
-                robot.scoring.verticalSlideExtension1.setPower(0);
-                robot.scoring.verticalSlideExtension2.setPower(0);
+                robot.scoring.verticalSlideExtension1.setPower(0.000375);
+                robot.scoring.verticalSlideExtension2.setPower(0.000375);
 
-                robot.scoring.verticalSlideExtension1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                robot.scoring.verticalSlideExtension2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-                robot.scoring.horizontalSlideExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.scoring.verticalSlideExtension1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.scoring.verticalSlideExtension2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 return true;
             }
 
